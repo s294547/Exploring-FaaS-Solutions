@@ -1,0 +1,23 @@
+specVersion: 0.35.0
+name: hello-function
+runtime: node
+registry: registry.salaolimpo.cloud
+image: docker.io/registry.salaolimpo.cloud/hello-function:latest
+imageDigest: ""
+created: 2023-02-16T16:37:12.540825885+01:00
+build:
+  buildpacks: []
+  builder: pack
+  buildEnvs: []
+run:
+  volumes: []
+  envs: []
+deploy:
+  namespace: openfaas-trial
+  remote: false
+  annotations: {}
+  options: {}
+  labels: []
+  healthEndpoints:
+    liveness: /health/liveness
+    readiness: /health/readiness

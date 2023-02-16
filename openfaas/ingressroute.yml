@@ -1,0 +1,22 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  creationTimestamp: "2023-02-13T14:00:01Z"
+  generation: 1
+  labels:
+    app: gateway
+  name: gateway
+  namespace: openfaas
+  resourceVersion: "565259"
+  uid: 09941c93-80b1-443d-abb4-253ab7dc7958
+spec:
+  entryPoints:
+  - https
+  routes:
+  - kind: Rule
+    match: Host(`gateway-faas.salaolimpo.cloud`)
+    services:
+    - kind: Service
+      name: gateway
+      namespace: openfaas
+      port: http

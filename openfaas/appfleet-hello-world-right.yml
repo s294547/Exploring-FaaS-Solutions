@@ -1,0 +1,9 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: "https://gateway-faas.salaolimpo.cloud"
+functions:
+  appfleet-hello-world-right:
+    lang: node
+    handler: ./appfleet-hello-world-right
+    image: registry.salaolimpo.cloud/appfleet-hello-world-right:latest
