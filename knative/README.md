@@ -32,7 +32,7 @@ This file will document all the steps required to deploy Knative Serving and eve
 This example was done using Docker Desktop on Windows 11 with Ubuntu 22 WSL 2. 
 It will also be reported an example of how to create a function with Knative.
 
-The repository up to now will just keep a *appfleet-hello-world-right.yaml* file and a directory *appfleet-hello-world-right* with the code of the Node.js function *appfleet-hello-world-right.js*.  
+The repository up to now will a directory *hello-function* with the code of the Node.js function in*index.js*.  
 
 ## Required Tools Installation
 
