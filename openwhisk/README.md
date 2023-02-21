@@ -203,7 +203,7 @@ Now let's analyze the most important resources created after having deployed Ope
 
 #### owdev-install-packages
 
-The job [*owdev-install-packages*](./sample-yaml/owdev-install-packages-job.yaml)manages the creation of almost one pod, which waits for at least one invoker to be availabe (in particular, this is done in the initContainers) and then executes the code in [*myTask.sh*](./openwhisk-deploy-kube/helm/openwhisk/configMapFiles/installPackages/myTask.sh), mounted as a volume with the ConfigMap [*owdev-install-packages*](./sample-yaml/owdev-install-packages-cm.yaml) which manages to:
+The job [*owdev-install-packages*](./sample-yaml/owdev-install-packages-job.yaml)manages the creation of almost one pod, which waits for at least one invoker to be availabe (in particular, this is done in the initContainers) and then executes the code in [*myTask.sh*](./../openwhisk-deploy-kube/helm/openwhisk/configMapFiles/installPackages/myTask.sh), mounted as a volume with the ConfigMap [*owdev-install-packages*](./sample-yaml/owdev-install-packages-cm.yaml) which manages to:
 
 1. Install Route Mgmt Support
 2. Install the OpenWhisk Catalog
@@ -212,12 +212,12 @@ The job [*owdev-install-packages*](./sample-yaml/owdev-install-packages-job.yaml
 5. Install the catalog for the Kafka provider
 
 #### owdev-gen-certs
-This job is creates a pod owdev-gen-certs-<randomId>. It can be found [here](./openwhisk-deploy-kube/helm/openwhisk/templates/gen-certs-job.yaml). Being more precise, thanks to this job the cluster can use an already existing certificate for the NGINX server, or, if it doesn't exist, it can generate a new one. This is done by mounting as a volume a ConfigMap, which is defined [here](./openwhisk-deploy-kube/helm/openwhisk/templates/gen-certs-cm.yaml). The whisk external api host name can be found is retrieved from the ConfigMap here [here](./openwhisk-deploy-kube/helm/openwhisk/templates/ow-whisk-cm.yaml). 
+This job is creates a pod owdev-gen-certs-<randomId>. It can be found [here](./../openwhisk-deploy-kube/helm/openwhisk/templates/gen-certs-job.yaml). Being more precise, thanks to this job the cluster can use an already existing certificate for the NGINX server, or, if it doesn't exist, it can generate a new one. This is done by mounting as a volume a ConfigMap, which is defined [here](./../openwhisk-deploy-kube/helm/openwhisk/templates/gen-certs-cm.yaml). The whisk external api host name can be found is retrieved from the ConfigMap here [here](./../openwhisk-deploy-kube/helm/openwhisk/templates/ow-whisk-cm.yaml). 
 These actions are required to prepare the file'/etc/nginx/nginx.conf', which is the NGINX configuration file,  and the files in '/etc/nginx/certs', which are your certificate files for the NGINX container.
 
 #### owdev-init-couchdb 
 
-The job [*owdev-init-couchdb*](./sample-yaml/owdev-init-couchdb-job.yaml) manages the creation of almost one pod, in which some environment variables with useful parameters to access the database are mounted from the ConfigMap [*owdev-db.config*](./sample-yaml/owdev-db.conf.yaml), but also from the Secret [*owdev-db.auth*](./sample-yaml/owdev-db.auth.yaml). Then, it executes the code in [*initdb.sh*](./openwhisk-deploy-kube/helm/openwhisk/configMapFiles/initCouchDB/initdb.sh), mounted as a volume with the ConfigMap [*owdev-init-couchdb*](./sample-yaml/owdev-init-couchdb-cm.yaml), which manages to:
+The job [*owdev-init-couchdb*](./sample-yaml/owdev-init-couchdb-job.yaml) manages the creation of almost one pod, in which some environment variables with useful parameters to access the database are mounted from the ConfigMap [*owdev-db.config*](./sample-yaml/owdev-db.conf.yaml), but also from the Secret [*owdev-db.auth*](./sample-yaml/owdev-db.auth.yaml). Then, it executes the code in [*initdb.sh*](./../openwhisk-deploy-kube/helm/openwhisk/configMapFiles/initCouchDB/initdb.sh), mounted as a volume with the ConfigMap [*owdev-init-couchdb*](./sample-yaml/owdev-init-couchdb-cm.yaml), which manages to:
 
 1. Clone OpenWhisk to get the ansible playbooks needed to initialize CouchDB
 2. Install the secrets whisk.auth.guest and whisk.auth.system into the cloned tree after removing the defaults inherited from the checkout of openwhisk
