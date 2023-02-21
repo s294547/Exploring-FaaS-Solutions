@@ -1,0 +1,28 @@
+apiVersion: v1
+data:
+  db_host: owdev-couchdb.openwhisk.svc.cluster.local
+  db_host_port: owdev-couchdb.openwhisk.svc.cluster.local:5984
+  db_port: "5984"
+  db_prefix: test_
+  db_protocol: http
+  db_provider: CouchDB
+  db_url: http://owdev-couchdb.openwhisk.svc.cluster.local:5984
+  db_whisk_actions: test_whisks
+  db_whisk_activations: test_activations
+  db_whisk_auths: test_subjects
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: owdev
+    meta.helm.sh/release-namespace: openwhisk
+  creationTimestamp: "2023-02-21T09:23:10Z"
+  labels:
+    app: owdev-openwhisk
+    app.kubernetes.io/managed-by: Helm
+    chart: openwhisk-1.0.1
+    heritage: Helm
+    release: owdev
+  name: owdev-db.config
+  namespace: openwhisk
+  resourceVersion: "14234"
+  uid: 600374d0-c736-4e85-aacd-7f691e754ae1

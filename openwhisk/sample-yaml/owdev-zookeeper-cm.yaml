@@ -1,0 +1,26 @@
+apiVersion: v1
+data:
+  zoo.cfg: |
+    tickTime=2000
+    clientPort=2181
+    initLimit=5
+    syncLimit=2
+    dataDir=/data
+    dataLogDir=/datalog
+    server.0=owdev-zookeeper-0.owdev-zookeeper.openwhisk.svc.cluster.local:2888:3888
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: owdev
+    meta.helm.sh/release-namespace: openwhisk
+  creationTimestamp: "2023-02-21T09:23:10Z"
+  labels:
+    app: owdev-openwhisk
+    app.kubernetes.io/managed-by: Helm
+    chart: openwhisk-1.0.1
+    heritage: Helm
+    release: owdev
+  name: owdev-zookeeper
+  namespace: openwhisk
+  resourceVersion: "14228"
+  uid: 50164a7c-3ecb-45f7-8bd5-9cd25fcc0646
