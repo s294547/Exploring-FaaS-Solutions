@@ -232,25 +232,69 @@ The job [*owdev-init-couchdb*](./sample-yaml/owdev-init-couchdb-job.yaml) manage
 
 ### owdev-couchdb
 
-[This](./sample-yaml/owdev-couchdb-deployment.yaml) is the deployment responsible for the creation of a Pod where the couchDB image is running.  Some environment variables with useful parameters to access the database are mounted from the Secret [*owdev-db.auth*](./sample-yaml/owdev-db.auth.yaml). It also mount a volume with a persistent volume claim [*owdev-couchdb-pvc*](./sample-yaml/owdev-couchdb-pvc.yaml),
+[This](./sample-yaml/owdev-couchdb-deployment) is the deployment responsible for the creation of a Pod where the couchDB image is running.  Some environment variables with useful parameters to access the database are mounted from the Secret [*owdev-db.auth*](./sample-yaml/owdev-db.auth.yaml). It also mount a volume with a persistent volume claim [*owdev-couchdb-pvc*](./sample-yaml/owdev-couchdb-pvc.yaml),
 which asks for 256Mi of storage and can be accessed both in read and write mode.
 
 ### owdev-redis
 
-[This](./sample-yaml/owdev-redis-deployment.yaml) is the deployment responsible for the creation of a Pod where the redis image is running. It mounts a volume with a persistent volume claim [*owdev-redis-pvc*](./sample-yaml/owdev-redis-pvc.yaml),
-which asks for 2Gi of storage and can be accessed both in read and write mode.
+[This](./sample-yaml/owdev-redis-deployment.yaml) is the deployment responsible for the creation of a Pod where the redis image is running. It mounts a volume with a persistent volume claim [*owdev-redis-pvc*](./sample-yaml/owdev-redis-pvc.yaml), which asks for 2Gi of storage and can be accessed both in read and write mode. 
+Redis is an open-source, in-memory data structure store that is commonly used as a database, cache, and message broker. It is often used in high-performance applications that require low-latency access to data, as it is designed to deliver fast read and write performance by keeping data in memory.
+In OpenWhisk, Redis is used as a cache to improve the performance of the platform. Specifically, Redis is used to cache the results of previous function executions, so that subsequent requests for the same function can be served more quickly. This is achieved by storing the result of a function execution in Redis, along with a unique identifier for the function and the input arguments that were passed to it.
+When a new request is received for the same function with the same input arguments, OpenWhisk checks if the result is already present in the Redis cache. If it is, OpenWhisk can immediately return the cached result, without having to execute the function again. This can significantly improve the response time of the platform, especially for functions that are frequently executed with the same input arguments.
+In addition to caching function results, Redis is also used by OpenWhisk for other purposes, such as storing authentication tokens and rate limiting information. Redis is a popular choice for these types of use cases because of its fast read and write performance, its support for complex data structures, and its ability to scale horizontally across multiple nodes.
 
+### owdev-alarmprovider
+
+[This](./sample-yaml/owdev-alarmprovider-deployment) is the deployment responsible for the creation of a Pod where the alarm provider image is running. OpenWhisk Alarm Provider is a service that allows you to schedule the execution of OpenWhisk actions at specified times or intervals. This provider allows you to create alarms that are triggered at a specific date and time, as well as to set up recurring alarms that are triggered at regular intervals.
+There are some environment variables with useful parameters to access the database mounted from the ConfigMaps [*owdev-db.config*](./sample-yaml/owdev-db.conf.yaml) and [*owdev-whisk.config*](./sample-yaml/owdev-wishk.config.yaml), but also from the Secret [*owdev-db.auth*](./sample-yaml/owdev-db.auth.yaml). It also mounts a volume with a persistent volume claim [*owdev-alarmprovider-pvc*](./sample-yaml/owdev-alarmprovider-pvc.yaml), which asks for 1Gi of storage and can be accessed both in read and write mode.
+It also has an init container *wait-for-controller* that waits for the controller service to be up and running.
+
+### owdev-nginx
+
+[This](./sample-yaml/owdev-nginx-deployment) is the deployment responsible for the creation of a Pod where the nginx server image is running. 
+It also mounts some volumes from the ConfigMap [*owdev-nginx*](./sample-yaml/owdev-nginx-cm.yaml), from the Secret [*owdev-nginx*](./sample-yaml/owdev-nginx-secret.yaml) and from an EmptyDir called *logs*.
+It also has an init container *wait-for-controller* that waits for the controller service to be up and running.
+
+### owdev-kafkaprovider
+
+[This](./sample-yaml/owdev-kafkaprovider-deployment) is the deployment responsible for the creation of a Pod where the kafka provider image is running, an Apache OpenWhisk event provider service for Kafka message queues. With the Kafka provider, you can create an OpenWhisk trigger that is associated with a Kafka topic. Whenever a new message is produced to that Kafka topic, the Kafka provider will automatically create a new event in OpenWhisk and trigger the associated serverless function. This allows you to build event-driven serverless applications that can respond in real-time to events that are generated by other systems. 
+There are some environment variables with useful parameters to access the database mounted from the ConfigMaps [*owdev-db.config*](./sample-yaml/owdev-db.conf.yaml) and [*owdev-whisk.config*](./sample-yaml/owdev-wishk.config.yaml), but also from the Secret [*owdev-db.auth*](./sample-yaml/owdev-db.auth.yaml). 
+It also has an init container *wait-for-controller* that waits for the controller service to be up and running.
 ### StatefulSets
 
 ### owdev-zookeeper
 
-[This](./sample-yaml/owdev-zookeeper-statefulset.yaml) is the StatefulSet responsible for the creation of a Pod where the zookeper image is running. It mounts a volume with a persistent volume claim [*owdev-zookeeper-pvc-data*](./sample-yaml/owdev-zookeeper-pvc-data.yaml), which stores the data of zookeeper and asks for 256Mi of storage and can be accessed both in read and write mode, another volume  with a persistent volume claim [*owdev-zookeeper-pvc-datalog*](./sample-yaml/owdev-zookeeper-pvc-datalog.yaml), which stores the logs of zookeeper and asks for 256Mi of storage and can be accessed both in read and write mode. The configuration parameters are taken from the ConfigMap [*owdev-zookeeper*](./sample-yaml/owdev-zookeeper-cm.yaml).
+[This](./sample-yaml/owdev-zookeeper-statefulset.yaml) is the StatefulSet responsible for the creation of a Pod for each node (in our case is just one) where the zookeper image is running. It mounts a volume with a persistent volume claim [*owdev-zookeeper-pvc-data*](./sample-yaml/owdev-zookeeper-pvc-data.yaml), which stores the data of zookeeper and asks for 256Mi of storage and can be accessed both in read and write mode, another volume  with a persistent volume claim [*owdev-zookeeper-pvc-datalog*](./sample-yaml/owdev-zookeeper-pvc-datalog.yaml), which stores the logs of zookeeper and asks for 256Mi of storage and can be accessed both in read and write mode. The configuration parameters are taken from the ConfigMap [*owdev-zookeeper*](./sample-yaml/owdev-zookeeper-cm.yaml).
 
 Apache ZooKeeper is an open-source distributed coordination service used for building and managing distributed systems. It is designed to help with tasks such as maintaining configuration information, providing distributed synchronization, and electing a leader among multiple nodes in a distributed system.
 
 ZooKeeper provides a simple and reliable way to manage the coordination of distributed applications. It works by maintaining a hierarchical namespace of data nodes, which can be used to store configuration information, synchronization data, and other kinds of metadata. Clients can watch for changes to these data nodes and receive notifications when they are updated, allowing them to coordinate their actions with other parts of the system.
 
 ZooKeeper is often used in distributed systems such as Apache Hadoop, Apache Kafka, and Apache Storm. Its ease of use, reliability, and scalability make it a popular choice for building and managing distributed systems.
+
+### owdev-kafka
+
+[This](./sample-yaml/owdev-kafka-statefulset.yaml) is the StatefulSet responsible for the creation of a Pod (in our case is just one) where the kafka server image is running.  It mounts a volume with a persistent volume claim [*owdev-kafka-pvc*](./sample-yaml/owdev-kafka-pvc.yaml), which stores the data of zookeeper and asks for 512Mi of storage and can be accessed both in read and write mode. It also has an init container that waits for the Zookeeper service to be up and running. 
+
+### owdev-controller
+
+[This](./sample-yaml/owdev-controller-statefulset.yaml) is the StatefulSet responsible for the creation of a Pod (in our case is just one) where the controller image is running. 
+There are some environment variables with useful parameters to access the database mounted from the ConfigMaps [*owdev-db.config*](./sample-yaml/owdev-db.conf.yaml) and [*owdev-whisk.config*](./sample-yaml/owdev-whisk.config.yaml), but also from the Secret [*owdev-db.auth*](./sample-yaml/owdev-db.auth.yaml).
+A lot of other environment variables with parameters related to OpenWhisk are set, like for example the *RUNTIMES_MANIFEST*, which contains a JSON document contains the list of available runtimes in OpenWhisk, which can be used to execute serverless functions. For each runtime (e.g. Node.js, Python, Swift, Java, PHP, Ruby), there is a list of versions, and for each version there are some details such as the Docker image that should be used to execute functions written in that language and version, whether the version is the default one or not, whether the version is deprecated or not, and whether an attachment (e.g. a code file or a JAR file) is required for the function to execute.
+
+It also has an init container *wait-for-kafka* that waits for the KAFKA service to be up and running and another init container *wait-for-couchdb*, that waits for couchDB to be up and running. 
+
+If the PodDisruptionBudget is enabled and we have more than one controller pod running, a [*controller-pdb*](./../openwhisk-deploy-kube/helm/openwhisk/templates/controller-pdb.yaml) PodDistruptionBudget resource is also defined, to limit the number of concurrent disruptions that your application experiences, allowing for higher availability while permitting the cluster administrator to manage the clusters nodes.
+
+### owdev-invoker
+
+[This](./sample-yaml/owdev-invoker-statefulset.yaml) is the StatefulSet responsible for the creation of a Pod (in our case is just one) where the invoker image is running. 
+There are some environment variables with useful parameters to access the database mounted from the ConfigMaps [*owdev-db.config*](./sample-yaml/owdev-db.conf.yaml) and [*owdev-whisk.config*](./sample-yaml/owdev-whisk.config.yaml), but also from the Secret [*owdev-db.auth*](./sample-yaml/owdev-db.auth.yaml).
+A lot of other environment variables with parameters related to OpenWhisk are set, like for example the *RUNTIMES_MANIFEST*, which contains a JSON document contains the list of available runtimes in OpenWhisk, which can be used to execute serverless functions. For each runtime (e.g. Node.js, Python, Swift, Java, PHP, Ruby), there is a list of versions, and for each version there are some details such as the Docker image that should be used to execute functions written in that language and version, whether the version is the default one or not, whether the version is deprecated or not, and whether an attachment (e.g. a code file or a JAR file) is required for the function to execute.
+
+It also has an init container *wait-for-controller* that waits for the controller service to be up and running.
+
+If the PodDisruptionBudget is enabled and we have more than one controller pod running, a [*invoker-pdb*](./../openwhisk-deploy-kube/helm/openwhisk/templates/invoker-pdb.yaml) PodDistruptionBudget resource is also defined, to limit the number of concurrent disruptions that your application experiences, allowing for higher availability while permitting the cluster administrator to manage the clusters nodes.
 ### Services
 
 #### owdev-couchdb
@@ -269,6 +313,18 @@ There are three ports defined in the Service object:
 2. Port with name *server* is used for communication between ZooKeeper instances in a cluster, typically for leader election and state replication.
 3. Port with name *leader-election* is used for leader election between ZooKeeper instances.
 
+### owdev-kafka
+[This](./sample-yaml/owdev-kafka-svc.yaml) is the service that can be used to access to the kafka service. It is exposed as a ClusterIp, so it can be reached only from inside the cluster.
+
+### owdev-controller
+[This](./sample-yaml/owdev-controller-svc.yaml) is the service that can be used to access to the controller service. It is exposed as a ClusterIp, so it can be reached only from inside the cluster.
+
+#### owdev-nginx
+[This](./sample-yaml/owdev-nginx-svc.yaml) is the service that can be used to access to the nginx service. It is exposed as a ClusterIp, so it can be reached only from inside the cluster.
+There are two ports defined in the Service object:
+
+1. Port with name *http* is the port used by clients to connect to the nginx server with the http protocol.
+2. Port with name *https* is the port used by clients to connect to the nginx server with the https protocol.
 ### Pods
 
 #### owdev-wskadmin
@@ -309,6 +365,31 @@ For example, is your deployment name is owdev and the namespace is openwhisk you
 ```
 $ kubectl -n openwhisk  -ti exec owdev-wskadmin -- wskadmin user list guest
 ```
+### wskowdev-invoker-00-<instancenumber>-prewarm-nodejs14
+
+This pod is created by system controller component. In this particular case, the Pod is a pre-warmed Pod that has been created in advance of any action being invoked. The pre-warming process helps reduce the startup time for an action when it is first invoked. When an action is invoked, OpenWhisk will select a pre-warmed Pod to run the code for the action, which can help improve the response time for the action.
+
+It is also possible to see that the Kubernetes control plane (specifically, the ServiceAccount admission controller) adds a projected volume to Pods, and this volume includes a token for Kubernetes API access. A section really similar to the following could be found in the yaml file related to the pod we are analyzing:
+
+```
+  - name: kube-api-access-<random-suffix>
+    projected:
+      sources:
+        - serviceAccountToken:
+            path: token # must match the path the app expects
+        - configMap:
+            items:
+              - key: ca.crt
+                path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+              - fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+                path: namespace
+```
+
 #### owdev-gen-certs-<randomId>
 
 This pod is created by the job owdev-gen-certs, which can be found [here](./../openwhisk-deploy-kube/helm/openwhisk/templates/gen-certs-job.yaml). Being more precise, thanks to this job the cluster can use an already existing certificate for the NGINX server, or, if it doesn't exist, it can generate a new one. This is done by mounting as a volume a ConfigMap, which is defined [here](./../openwhisk-deploy-kube/helm/openwhisk/templates/gen-certs-cm.yaml). The whisk external api host name can be found is retrieved from the ConfigMap here [here](./../openwhisk-deploy-kube/helm/openwhisk/templates/ow-whisk-cm.yaml). 
@@ -341,6 +422,42 @@ After having deployed OpenWhisk, the status of this pod is **Running**.
 ### owdev-zookeeper-<randomId>
 
 This pod is created by the StatefulSet [*owdev-zookeeper*](./sample-yaml/owdev-zookeeper-statefulset.yaml). Its function is described in [this section](#owdev-zookeeper). 
+
+After having deployed OpenWhisk, the status of this pod is **Running**.
+
+### owdev-kafka-<randomId>
+
+This pod is created by the StatefulSet [*owdev-kafka*](./sample-yaml/owdev-kafka-statefulset.yaml). Its function is described in [this section](#owdev-kafka). 
+
+After having deployed OpenWhisk, the status of this pod is **Running**.
+
+### owdev-controller-<randomId>
+
+This pod is created by the StatefulSet [*owdev-controller*](./sample-yaml/owdev-controller-statefulset.yaml). Its function is described in [this section](#owdev-controller). 
+
+After having deployed OpenWhisk, the status of this pod is **Running**.
+
+### owdev-alarmprovider-<randomId>
+
+This pod is created by the Deployment [*owdev-alarmprovider*](./sample-yaml/owdev-alarmprovider-deployment.yaml). Its function is described in [this section](#owdev-alarmprovider). 
+
+After having deployed OpenWhisk, the status of this pod is **Running**.
+
+### owdev-invoker-<randomId>
+
+This pod is created by the StatefulSet [*owdev-invoker*](./sample-yaml/owdev-invoker-statefulset.yaml). Its function is described in [this section](#owdev-invoker). 
+
+After having deployed OpenWhisk, the status of this pod is **Running**.
+
+### owdev-nginx-<randomId>
+
+This pod is created by the Deployment [*owdev-nginx*](./sample-yaml/owdev-nginx-deployment.yaml). Its function is described in [this section](#owdev-nginx). 
+
+After having deployed OpenWhisk, the status of this pod is **Running**.
+
+### owdev-kafkaprovider-<randomId>
+
+This pod is created by the Deployment [*owdev-kafkaprovider*](./sample-yaml/owdev-kafkaprovider-deployment.yaml). Its function is described in [this section](#owdev-kafkaprovider). 
 
 After having deployed OpenWhisk, the status of this pod is **Running**.
 
