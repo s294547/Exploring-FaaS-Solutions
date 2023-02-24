@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: traefik
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels: {{ include "app.labels" . | nindent 8}}
+        app.kubernetes.io/component: traefik
+      annotations:
+        generation: "{{ .Release.Revision }}"
+    spec:
+      containers:
+      - name: traefik
+        image: "{{ .Values.deploy.traefik_image }}"
+        imagePullPolicy: Always
+        env:
+        - name: TZ
+          value: "Europe/Rome"
+        volumeMounts:
+        - name: traefik-config
+          mountPath: /etc/traefik/
+{{- if .Values.traefik.letsencrypt }}
+        - name: traefik-certs
+          mountPath: /letsencrypt
+{{- end }}
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        - name: https
+          containerPort: 8443
+          protocol: TCP
+        - name: internal
+          containerPort: 9000
+          protocol: TCP
+{{- if .Values.deploy.resources }}
+        resources:
+    {{- .Values.deploy.resources | toYaml | nindent 10 }}
+{{- end }}
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: internal
+          initialDelaySeconds: 30
+          timeoutSeconds: 2
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: internal
+          timeoutSeconds: 2
+      volumes:
+      - name: traefik-config
+        configMap:
+          name: traefik-config
+{{- if .Values.traefik.letsencrypt }}
+      - name: traefik-certs
+        persistentVolumeClaim:
+          claimName: traefik-certs
+{{- end }}
+      serviceAccountName: traefik

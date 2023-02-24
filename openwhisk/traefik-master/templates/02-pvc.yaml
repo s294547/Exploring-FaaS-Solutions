@@ -1,0 +1,15 @@
+{{- if .Values.traefik.letsencrypt }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: traefik-certs
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: traefik
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: "{{ .Values.storage.storage_class }}"
+  resources:
+    requests:
+      storage: "{{ .Values.storage.storage_size }}"
+{{- end }}

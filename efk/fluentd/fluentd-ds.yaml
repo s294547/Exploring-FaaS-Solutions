@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd
+  labels:
+    app: fluentd
+spec:
+  selector:
+    matchLabels:
+      app: fluentd
+  template:
+    metadata:
+      labels:
+        app: fluentd
+    spec:
+      serviceAccount: fluentd
+      serviceAccountName: fluentd
+      containers:
+      - name: fluentd
+        image: fluent/fluentd-kubernetes-daemonset:v1.15.3-debian-elasticsearch7-1.1
+        env:
+          - name:  FLUENT_ELASTICSEARCH_HOST
+            value: "elasticsearch-master.logging.svc.cluster.local"
+          - name:  FLUENT_ELASTICSEARCH_PORT
+            value: "9200"
+          - name: FLUENT_ELASTICSEARCH_SCHEME
+            value: "https"
+          - name: FLUENTD_SYSTEMD_CONF
+            value: disable
+          - name: FLUENT_ELASTICSEARCH_USER
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: elasticsearch-master-credentials # The password you've got. These are the defaults. # The username you've set up for elasticsearch
+          - name: FLUENT_ELASTICSEARCH_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: elasticsearch-master-credentials # The password you've got. These are the defaults.
+          - name: FLUENT_ELASTICSEARCH_SSL_VERIFY
+            value: "false"
+          - name: FLUENT_ELASTICSEARCH_SSL_VERSION
+            value: "TLSv1_2"
+          - name: FLUENT_ELASTICSEARCH_TLS_VERSION
+            value: "TLSv1_2"
+          - name: FLUENT_ELASTICSEARCH_TLS_VERIFY
+            value: "false"
+          - name: SUPPRESS_TYPE_NAME
+            value: "true"
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers

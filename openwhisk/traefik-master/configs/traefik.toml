@@ -1,0 +1,42 @@
+[global]
+  checknewversion = true
+  sendAnonymousUsage = false
+
+[providers.kubernetesCRD]
+
+[ping]
+  entryPoint = "internal"
+
+[api]
+  dashboard = true
+  debug = true
+
+[entryPoints.http]
+  address = ":8000"
+  [entryPoints.http.http.redirections.entryPoint]
+    to = ":{{ .Values.traefik.entrypoints.secure.port }}"
+    scheme = "https"
+
+[entryPoints.https]
+  address = ":8443"
+  [entryPoints.https.http.tls]
+{{- if .Values.traefik.letsencrypt }}
+    certResolver = "letsencrypt"
+
+[certificatesResolvers.letsencrypt.acme]
+  email = "postmaster@{{ .Values.global.domain_name }}"
+  storage = "/letsencrypt/acme.json"
+  [certificatesResolvers.letsencrypt.acme.httpChallenge]
+    entryPoint = "http"
+{{- end }}
+
+[entryPoints.internal]
+  address = ":9000"
+
+[accessLog]
+  filePath = "/var/log/access.log"
+
+{{- if .Values.metrics.enabled }}
+[metrics.prometheus]
+  entryPoint = "internal"
+{{- end }}

@@ -1,0 +1,15 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: traefik
+spec:
+  entryPoints:
+  - https
+  routes:
+  - kind: Rule
+    match: Host(`traefik.{{ .Values.global.domain_name }}`)
+    services:
+    - kind: TraefikService
+      name: api@internal

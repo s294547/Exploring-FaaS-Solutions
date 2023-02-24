@@ -1,0 +1,16 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: kibana
+  labels:
+    app: kibana
+spec:
+  routes:
+  - kind: Rule
+    match: Host(`kibana-gateway.liquidfaas.cloud`)
+    services:
+    - kind: Service
+      name: eck-kibana-kibana
+      namespace: logging
+      port: 5601
+

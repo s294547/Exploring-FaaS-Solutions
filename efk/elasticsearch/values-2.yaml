@@ -1,0 +1,15 @@
+replicas: 1
+minimumMasterNodes: 1
+
+ingress:
+  enabled: false
+
+discovery:
+  type: "single-node"
+ 
+  
+volumeClaimTemplate:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi

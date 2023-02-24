@@ -1,0 +1,3 @@
+elasticsearchHosts: "https://elasticsearch-master:9200"
+ingress:
+  enabled: false

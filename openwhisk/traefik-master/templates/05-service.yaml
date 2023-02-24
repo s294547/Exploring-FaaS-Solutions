@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: traefik
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  externalIPs:
+  - {{ .Values.global.ipv4_address }}
+  ports:
+  - name: web
+    port: {{ .Values.traefik.entrypoints.web.port }}
+    protocol: TCP
+    targetPort: http
+  - name: websecure
+    port: {{ .Values.traefik.entrypoints.secure.port }}
+    protocol: TCP
+    targetPort: https
+  selector: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: traefik
+---
+{{- if .Values.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-internal
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: traefik
+spec:
+  ports:
+  - name: metrics
+    port: 9000
+    protocol: TCP
+    targetPort: internal
+  selector: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: traefik
+{{- end }}
