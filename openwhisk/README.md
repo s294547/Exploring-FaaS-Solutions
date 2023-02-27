@@ -22,13 +22,20 @@
     4. [Deploy OpenWhisk with Helm](#deploy-openwhisk-with-helm)
 4. [Configure the wsk cli properties](#configure-the-wsk-cli-properties)
 5. [Create an action](#create-an-action)
+	1. [What happens in OpenWhisk components](#what-happens-in-openwhisk-components)
 6. [Invoke an action](#invoke-an-action)
-7. [Remove OpenWhisk](#remove-openwhisk)
-8. [OpenWhisk Deep Dive](#openwhisk-deep-dive)
+	1. [What happens in OpenWhisk components](#what-happens-in-openwhisk-components-1)
+7. [Delete an action](#delete-an-action)
+	1. [What happens in OpenWhisk components](#what-happens-in-openwhisk-components-2)
+8. [Remove OpenWhisk](#remove-openwhisk)
+9. [OpenWhisk Deep Dive](#openwhisk-deep-dive)
 	1. [Jobs](#jobs)
 	2. [Deployments](#deployments)
 	3. [Stateful Sets](#statefulsets)
 	4. [Pods](#pods)
+10. [Additional Informations](#additional-informations)
+	1. [Openwhisk datastore cache](#openwhisk-datastore-cache)
+	1. [ShardingContainerPoolBalancer](#shardingcontainerpoolbalancer)
 
 ## Introduction
 This file will document all the steps required to deploy OpenWhisk on a given Kubernetes Cluster.
@@ -163,6 +170,82 @@ Create a web action.
 ```
 wsk -i action create helloWorldAction helloWorldAction.js --web true
 ```
+### What happens in OpenWhisk components
+
+After creating an action, I checked the logs of the controller pod to better understand what is exactly happening. So, i executed this command:
+
+```
+kubectl get logs owdev-controller-0 -n openwhisk
+
+```
+
+Here are reported the logs retrieved, all of them followed by a clear explanation of what is happening. For more informations about the *Openwhisk datastore cache*, read [this section](#openwisk-datastore-cache)
+
+1. 
+``` 
+[2023-02-24T13:48:26.445Z] [INFO] [#tid_V0BhIvDMwJf3EpjW5tDYHbwIiXn7wWCI] PUT /api/v1/namespaces/_/actions/helloWorldAction overwrite=false
+```
+ This log entry indicates that a PUT request was made to create an OpenWhisk action called "helloWorldAction" with the "overwrite" parameter set to "false", so the write operation will fail if there is already data stored with the same key.
+2.
+```
+[2023-02-24T13:48:26.584Z] [INFO] [#tid_V0BhIvDMwJf3EpjW5tDYHbwIiXn7wWCI] [Identity] [GET] serving from datastore: CacheKey(23bc46b1-71f6-4ed5-8c54-816aa4f8c502) [marker:database_cacheMiss_counter:146]
+```
+This entry indicates that a GET request was made to retrieve an identity from the data store cache. Since a marker database_cacheMiss_counter can be seen in the log, we can guess that, the data being requested was not found in the system's cache, and had to be retrieved from the datastore.
+
+3.
+```
+[2023-02-24T13:48:26.591Z] [INFO] [#tid_V0BhIvDMwJf3EpjW5tDYHbwIiXn7wWCI] [CouchDbRestStore] [QUERY] 'test_subjects' searching 'subjects.v2.0.0/identities [marker:database_queryView_start:154]
+```
+This log entry indicates that a query was made to the CouchDB database to search for identities that match the specified criteria. The query was initiated at the marker point 154.
+
+4.
+```
+[2023-02-24T13:48:26.812Z] [INFO] [#tid_V0BhIvDMwJf3EpjW5tDYHbwIiXn7wWCI] [CouchDbRestStore] [marker:database_queryView_finish:374:220]
+```
+This entry indicates that the CouchDB query from the previous log entry has completed. The marker point 374:220 indicates the time elapsed since the start of the query.
+
+5.
+```
+[2023-02-24T13:48:27.031Z] [INFO] [#tid_V0BhIvDMwJf3EpjW5tDYHbwIiXn7wWCI] [WhiskAction] [GET] serving from datastore: CacheKey(guest/helloWorldAction) [marker:database_cacheMiss_counter:594]
+```
+This entry indicates that a GET request was made to retrieve the "helloWorldAction" action from the OpenWhisk datastore cache.Since a marker database_cacheMiss_counter can be seen in the log, we can guess that, the data being requested was not found in the system's cache, and had to be retrieved from the datastore.
+
+6.
+```
+[2023-02-24T13:48:27.032Z] [INFO] [#tid_V0BhIvDMwJf3EpjW5tDYHbwIiXn7wWCI] [CouchDbRestStore] [GET] 'test_whisks' finding document: 'id: guest/helloWorldAction' [marker:database_getDocument_start:595]
+```
+This entry indicates that a GET request was made to retrieve the "helloWorldAction" action document from the CouchDB database. The request was initiated at the marker point 595.
+
+7.
+```
+[2023-02-24T13:48:27.304Z] [INFO] [#tid_V0BhIvDMwJf3EpjW5tDYHbwIiXn7wWCI] [WhiskAction] write initiated on new cache entry
+```
+This log indicates that a write operation has been initiated on a new cache entry.
+
+
+8.
+```
+[2023-02-24T13:48:27.366Z] [INFO] [#tid_V0BhIvDMwJf3EpjW5tDYHbwIiXn7wWCI] [CouchDbRestStore] [PUT] 'test_whisks' saving document: 'id: guest/helloWorldAction, rev: null' [marker:database_saveDocument_start:928]
+```
+This log entry shows that a PUT request is being made to save a document with an ID of "guest/helloWorldAction" in the "test_whisks" database, with a revision of null.
+
+9.
+```
+[2023-02-24T13:48:27.419Z] [INFO] [#tid_V0BhIvDMwJf3EpjW5tDYHbwIiXn7wWCI] [CouchDbRestStore] [marker:database_saveDocument_finish:982:53]
+```
+This log entry shows that the document save operation has finished with a timestamp of 982ms and 53ms of processing time.
+
+10.
+```
+[2023-02-24T13:48:27.421Z] [INFO] [#tid_V0BhIvDMwJf3EpjW5tDYHbwIiXn7wWCI] [WhiskAction] write all done, caching CacheKey(guest/helloWorldAction) Cached
+```
+This log entry shows that the write operation for the "helloWorldAction" action has been completed, and it has been cached with the key "CacheKey(guest/helloWorldAction)".
+
+11.
+```
+[2023-02-24T13:48:27.503Z] [INFO] [#tid_V0BhIvDMwJf3EpjW5tDYHbwIiXn7wWCI] [BasicHttpService] [marker:http_put.200_counter:1065:1065]
+```
+This log entry shows that the HTTP PUT request for the "helloWorldAction" action has been completed successfully with a 200 status code. The counter value of 1065 indicates the number of successful PUT requests that have been processed by the system.
 ## Invoke an Action
 You can now invoke the action from shell.
 ```
@@ -175,6 +258,322 @@ Or get the action URL to use it as a webservice.
 wsk -i action get helloWorldAction --url
 ```
 You can use the action URL to test it through Postman.
+
+### What happens in OpenWhisk components
+
+#### Controller Logs 
+
+After having invoked an action, I checked the logs of the controller pod to better understand what is exactly happening. So, i executed this command:
+
+```
+kubectl get logs owdev-controller-0 -n openwhisk
+
+```
+
+Here are reported the logs retrieved, all of them followed by a clear explanation of what is happening. For more informations about the *Openwhisk datastore cache*, read [this section](#openwisk-datastore-cache), while for more informations about the *ShardingContainerPoolBalancer* read [this section](#shardingcontainerpoolbalancer).
+
+1.
+```
+[2023-02-24T14:40:40.816Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] POST /api/v1/namespaces/_/actions/helloWorldAction blocking=true&result=true
+```
+The application receives a POST request to the /api/v1/namespaces/_/actions/helloWorldAction endpoint with blocking=true and result=true parameters.
+
+2.
+```
+[2023-02-24T14:40:40.892Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [Identity] [GET] serving from datastore CacheKey(23bc46b1-71f6-4ed5-8c54-816aa4f8c502) [marker:database_cacheMiss_counter:15]
+```
+The application retrieves an identity from the datastore cache. Since a marker database_cacheMiss_counter can be seen in the log, we can guess that, the data being requested was not found in the system's cache, and had to be retrieved from the datastore.
+
+3.
+```
+[2023-02-24T14:40:40.892Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [CouchDbRestStore] [QUERY] 'test_subjects' searching 'subjects.v2.0.0/identities [marker:database_queryView_start:15]
+```
+The application performs a query on the test_subjects CouchDB database to retrieve identities.
+
+4.
+```
+[2023-02-24T14:40:40.930Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [CouchDbRestStore] [marker:database_queryView_finish:115:100]
+```
+The query on the test_subjects CouchDB database finishes successfully.
+
+5.
+```
+[2023-02-24T14:40:41.339Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [WhiskActionMetaData] [GET] serving from datastore: CacheKey(guest/helloWorldAction) [marker:database_cacheMiss_counter:524]
+```
+The application retrieves metadata related to the helloWorldAction action from the datastore cache. Since a marker database_cacheMiss_counter can be seen in the log, we can guess that, the data being requested was not found in the system's cache, and had to be retrieved from the datastore.
+
+6.
+```
+[2023-02-24T14:40:41.340Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [CouchDbRestStore] [GET] 'test_whisks' finding document: 'id: guest/helloWorldAction' [marker:database_getDocument_start:525]
+```
+The application retrieves the helloWorldAction document from the test_whisks CouchDB database.
+
+7.
+```
+[2023-02-24T14:40:41.361Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [CouchDbRestStore] [marker:database_getDocument_finish:546:21]
+```
+The retrieval of the document has finished. 
+
+8.
+```
+[2023-02-24T14:40:41.387Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [ActionsApi] action activation id: 64b0b115410849f3b0b115410889f397 [marker:controller_loadbalancer_start:572]
+```
+This log message indicates that the action activation process has begun, and it provides the activation ID for the action, which is 64b0b115410849f3b0b115410889f397.
+
+9.
+```
+[2023-02-24T14:40:41.403Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [ShardingContainerPoolBalancer] scheduled activation 64b0b115410849f3b0b115410889f397, action 'guest/helloWorldAction@0.0.1' (managed), ns 'guest', mem limit 256 MB (std), time limit 60000 ms (std) to invoker0/owdev-invoker-0
+```
+This log message provides information about the scheduling of the action activation. It indicates that the activation with ID 64b0b115410849f3b0b115410889f397 is being scheduled for execution on invoker0/owdev-invoker-0, with a memory limit of 256 MB and a time limit of 60000 ms.
+
+10.
+```
+[2023-02-24T14:40:41.417Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [ShardingContainerPoolBalancer] posting topic 'invoker0' with activation id '64b0b115410849f3b0b115410889f397' [marker:controller_kafka_start:602]
+```
+This log message indicates that the activation with ID 64b0b115410849f3b0b115410889f397 is being posted to invoker0.
+
+11.
+```
+[2023-02-24T14:40:41.440Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [ShardingContainerPoolBalancer] posted to invoker0[0][26] [marker:controller_kafka_finish:622:20]
+```
+This log message indicates that the activation with ID 64b0b115410849f3b0b115410889f397 has been successfully posted to invoker0.
+
+12.
+```
+[2023-02-24T14:40:41.444Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [ActionsApi] [marker:controller_loadbalancer_finish:628:56]
+```
+This log message indicates that the action activation process has completed successfully, and it provides the time taken for the process to complete. In this case, it took 56 ms.
+
+#### Invoker Logs
+
+After having invoked an action, I also checked the logs of the invoker pod to better understand what is exactly happening. So, i executed this command:
+
+```
+kubectl get logs owdev-invoker-0 -n openwhisk
+
+```
+
+Here are reported the logs retrieved, all of them followed by a clear explanation of what is happening. For more informations about the *Openwhisk datastore cache*, read [this section](#openwisk-datastore-cache)
+
+1.
+```
+[2023-02-24T14:40:41.488Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [InvokerReactive] [marker:invoker_activation_start:672]
+```
+This log indicates that an activation of the action has started.
+
+2.
+```
+[2023-02-24T14:40:41.658Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [WhiskAction] [GET] serving from datastore: CacheKey(guest/helloWorldAction) [marker:database_cacheMiss_counter:842]
+```
+This entry indicates that a GET request was made to retrieve an action from the data store cache. Since a marker database_cacheMiss_counter can be seen in the log, we can guess that, the data being requested was not found in the system's cache, and had to be retrieved from the datastore.
+
+3.
+```
+[2023-02-24T14:40:41.658Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [CouchDbRestStore] [GET] 'test_whisks' finding document: 'id: guest/helloWorldAction, rev: 1-e691be412ca97f52bc6c4a195309feb9' [marker:database_getDocument_start:843]
+```
+This log indicates that the CouchDB database is being accessed to retrieve the action document with the given id and revision.
+
+4.
+```
+[2023-02-24T14:40:41.734Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [CouchDbRestStore] [marker:database_getDocument_finish:919:76]
+```
+This log indicates that the retrieval of the action document from the database is complete.
+
+5.
+```
+[2023-02-24T14:40:41.831Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [WhiskAction] write initiated on existing cache entry, invalidating CacheKey(guest/helloWorldAction), tid 7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD, state WriteInProgress
+```
+This log indicates that a write operation is being initiated on the action cache entry.
+
+6.
+```
+[2023-02-24T14:40:41.838Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [WhiskAction] write all done, caching CacheKey(guest/helloWorldAction) Cached
+```
+This log indicates that the write operation on the action cache entry is complete.
+
+7.
+```
+[2023-02-24T14:40:41.894Z] [INFO] [#tid_sid_invokerWarmup] [KubernetesClient] launching pod wskowdev-invoker-00-257-prewarm-nodejs14 (image:openwhisk/action-nodejs-v14:1.20.0, mem: 256) (timeout: 60s) [marker:invoker_kubeapi.create_start:86186440]
+```
+This log indicates that a Kubernetes pod is being launched to prewarm the invoker.
+
+8.
+```
+[2023-02-24T14:40:41.895Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [ContainerPool] containerStart containerState: prewarmed container: Some(ContainerId(wskowdev-invoker-00-256-prewarm-nodejs14)) activations: 1 of max 1 action: helloWorldAction namespace: guest activationId: 64b0b115410849f3b0b115410889f397 [marker:invoker_containerStart.prewarmed_counter:1079]
+```
+This log indicates that a container called "wskowdev-invoker-00-256-prewarm-nodejs14" is being started to handle an activation of the "helloWorldAction" function. The container is part of a container pool, which ensures that there is always at least one container available to handle requests. The activation is identified by an activation ID of "64b0b115410849f3b0b115410889f397".
+
+9.
+```
+[2023-02-24T14:40:41.949Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [KubernetesContainer] sending initialization to ContainerId(wskowdev-invoker-00-256-prewarm-nodejs14) ContainerAddress(10.42.0.191,8080) [marker:invoker_activationInit_start:1134]
+```
+This log indicates that the container is being initialized with the necessary dependencies to run the "helloWorldAction" function.
+
+10.
+```
+[2023-02-24T14:40:42.027Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [KubernetesContainer] initialization result: ok [marker:invoker_activationInit_finish:1210:76]
+```
+This log indicates that the container initialization was successful.
+
+11.
+```
+[2023-02-24T14:40:42.027Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [KubernetesContainer] sending arguments to /guest/helloWorldAction at ContainerId(wskowdev-invoker-00-256-prewarm-nodejs14) ContainerAddress(10.42.0.191,8080) [marker:invoker_activationRun_start:1211]
+```
+This log indicates that the arguments required to run the "helloWorldAction" function are being sent to the container.
+
+12.
+```
+[2023-02-24T14:40:42.039Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [KubernetesContainer] running result: ok [marker:invoker_activationRun_finish:1222:10]
+```
+This log indicates that the "helloWorldAction" function has been executed successfully within the container.
+
+13.
+```
+[2023-02-24T14:40:42.046Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [ContainerProxy] [marker:invoker_collectLogs_start:1230]
+```
+This log indicates that the container proxy has started collecting logs. The [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] is likely a thread ID, and invoker_collectLogs_start is a marker used to track this specific event in the logs.
+
+14.
+```
+[2023-02-24T14:40:42.078Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [ContainerProxy] [marker:invoker_collectLogs_finish:1262:30]
+```
+This log indicates that the container proxy has finished collecting logs. The invoker_collectLogs_finish marker is used to track the end of this event in the logs. The timestamp is slightly later than the start log, indicating that this event took around 30ms to complete.
+
+15.
+```
+[2023-02-24T14:40:42.081Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [CouchDbRestStore] [PUT] 'test_activations' saving document: 'id: guest/64b0b115410849f3b0b115410889f397, rev: null' [marker:database_saveDocument_start:1265]
+```
+This log indicates that the CouchDbRestStore is saving a document to a database named 'test_activations'. The document has an ID of 'guest/64b0b115410849f3b0b115410889f397' and a null revision. The database_saveDocument_start marker is used to track the start of this event in the logs.
+
+16.
+```
+[2023-02-24T14:40:42.082Z] [INFO] [#tid_sid_dbBatcher] [CouchDbRestStore] 'test_activations' saving 1 documents [marker:database_saveDocumentBulk_start:86186627]
+```
+This log appears to be related to the same event as the previous log. It indicates that the CouchDbRestStore is saving one document to the 'test_activations' database, and the database_saveDocumentBulk_start marker is used to track the start of this event in the logs. The [#tid_sid_dbBatcher] is likely another thread ID.
+
+17.
+```
+[2023-02-24T14:40:42.103Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [MessagingActiveAck] posted completion of activation 64b0b115410849f3b0b115410889f397
+```
+This log indicates that the serverless function with ID 64b0b115410849f3b0b115410889f397 has been completed and its execution status has been communicated to the messaging system.
+
+18.
+```
+[2023-02-24T14:40:42.105Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [MessagingActiveAck] posted result of activation 64b0b115410849f3b0b115410889f397 
+```
+This log indicates that the result of the execution of the serverless function with ID 64b0b115410849f3b0b115410889f397 has been communicated to the messaging system.
+
+19.
+```
+[2023-02-24T14:40:42.126Z] [INFO] [#tid_sid_dbBatcher] [CouchDbRestStore] [marker:database_saveDocumentBulk_finish:86186672:44]
+```
+This log indicates that a batch of documents has been saved to a database. It is likely that the serverless function is persisting data to a database.
+
+20.
+```
+[2023-02-24T14:40:42.129Z] [INFO] [#tid_7reXCmR4fHTAwdwlWCMpJ7Tm9tShbiuD] [CouchDbRestStore] [marker:database_saveDocument_finish:1313:47]
+```
+This log indicates that a single document has been saved to a database. It is likely that the serverless function is persisting data to a database.
+
+## Delete an action
+
+To delete an action in OpenWhisk, we must do:
+```
+wsk action delete helloWorldAction --insecure
+```
+I needed to add the insecure tag, since the certificate provided by openwhisk didnìt contain any IP SANs and it was self-signed.
+
+### What happens in OpenWhisk components
+
+### Controller Logs
+
+1. 
+```
+[2023-02-27T09:27:59.340Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] DELETE /api/v1/namespaces/_/actions/helloWorldAction
+```
+This log message indicates that a DELETE request was made to the specified API endpoint. The timestamp of the request is given in ISO-8601 format, and the unique thread ID is also provided.
+
+2. 
+```
+[2023-02-27T09:27:59.349Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] [Identity] [GET] serving from datastore: CacheKey(23bc46b1-71f6-4ed5-8c54-816aa4f8c502) [marker:database_cacheMiss_counter:9]
+```
+This log message indicates that an Identity GET operation was performed on the specified cache key from the datastore. The marker "database_cacheMiss_counter" with a count of 9 indicates that the cache was not present and had to be retrieved from the datastore.
+
+3. 
+```
+[2023-02-27T09:27:59.349Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] [CouchDbRestStore] [QUERY] 'test_subjects' searching 'subjects.v2.0.0/identities [marker:database_queryView_start:10]
+```
+This log message indicates that a query was performed on the specified database 'test_subjects' and view 'subjects.v2.0.0/identities'. The marker "database_queryView_start" with a count of 10 indicates the start of the query.
+
+4. 
+```
+[2023-02-27T09:27:59.407Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] [CouchDbRestStore] [marker:database_queryView_finish:68:58]
+```
+This log message indicates that the query from the previous log message finished. The marker "database_queryView_finish" with a count of 68:58 indicates the end time of the query.
+
+5. 
+```
+[2023-02-27T09:27:59.420Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] [WhiskAction] [GET] serving from datastore: CacheKey(guest/helloWorldAction) [marker:database_cacheMiss_counter:80]
+```
+This log message indicates that a GET operation was performed on the specified cache key 'guest/helloWorldAction' from the datastore. The marker "database_cacheMiss_counter" with a count of 80 indicates that the cache was not present and had to be retrieved from the datastore.
+
+6. 
+```
+[2023-02-27T09:27:59.420Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] [CouchDbRestStore] [GET] 'test_whisks' finding document: 'id: guest/helloWorldAction' [marker:database_getDocument_start:81]
+```
+This log message indicates that a GET operation was performed on the specified document ID 'guest/helloWorldAction' in the database 'test_whisks'. 
+
+7. 
+```
+[2023-02-27T09:27:59.438Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] [CouchDbRestStore] [marker:database_getDocument_finish:99:18]
+```
+This log indicates that a database document has been retrieved successfully. The marker "database_getDocument_finish" suggests that this log is related to the end of the process of fetching a document from the database.
+
+8. 
+```
+[2023-02-27T09:27:59.453Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] [WhiskAction] write initiated on new cache entry
+```
+This log indicates that a new cache entry is being created. The marker "write initiated" suggests that the log is related to the start of the process of writing to the cache.
+
+9. 
+```
+[2023-02-27T09:27:59.454Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] [WhiskAction] write all done, caching CacheKey(guest/helloWorldAction) Cached
+```
+This log indicates that the cache entry has been successfully created and cached. The marker "write all done" suggests that this log is related to the end of the process of writing to the cache.
+
+10. 
+```
+[2023-02-27T09:27:59.459Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] [WhiskAction] invalidating CacheKey(guest/helloWorldAction) on delete
+```
+This log indicates that the cache entry with the key "guest/helloWorldAction" is being invalidated. The marker "invalidating" suggests that this log is related to the start of the process of invalidating the cache entry.
+
+11. 
+```
+[2023-02-27T09:27:59.460Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] [CouchDbRestStore] [DEL] 'test_whisks' deleting document: 'id: guest/helloWorldAction, rev: 1-e691be412ca97f52bc6c4a195309feb9' [marker:database_deleteDocument_start:121]
+```
+This log indicates that a document in the database is being deleted. The marker "database_deleteDocument_start" suggests that this log is related to the start of the process of deleting a document from the database.
+
+12. 
+```
+[2023-02-27T09:27:59.496Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] [CouchDbRestStore] [marker:database_deleteDocument_finish:157:36]
+```
+This log indicates that the document has been successfully deleted from the database. The marker "database_deleteDocument_finish" suggests that this log is related to the end of the process of deleting a document from the database.
+
+13. 
+```
+[2023-02-27T09:27:59.497Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] [WhiskAction] invalidating CacheKey(guest/helloWorldAction)
+```
+This log indicates that the cache entry with key CacheKey(guest/helloWorldAction) is being invalidated. This means that the cached value for this key is no longer valid and should be removed from the cache.
+
+14. 
+```
+[2023-02-27T09:27:59.503Z] [INFO] [#tid_bnPJButSUdMerFcGMmM04sLkI9ru4uB4] [BasicHttpService] [marker:http_delete.200_counter:164:164]
+```
+This log indicates that an HTTP DELETE request was successful (status code 200) and provides a marker with a counter value of 164. It is likely that this request was sent to delete a document from a CouchDB database, based on the previous logs.
+
+#### Invoker Logs
+
+There are no significant logs for the invoker related to this operation. 
 
 ## Remove OpenWhisk
 
@@ -460,5 +859,119 @@ After having deployed OpenWhisk, the status of this pod is **Running**.
 This pod is created by the Deployment [*owdev-kafkaprovider*](./sample-yaml/owdev-kafkaprovider-deployment.yaml). Its function is described in [this section](#owdev-kafkaprovider). 
 
 After having deployed OpenWhisk, the status of this pod is **Running**.
+
+## Additional informations
+
+### Openwisk datastore cache
+
+OpenWhisk has a datastore cache that is used to improve the performance of function invocations by reducing the number of requests to the underlying data store.
+
+The datastore cache in OpenWhisk is implemented using Apache CouchDB's built-in caching mechanism, which is based on a Least Recently Used (LRU) algorithm. This caching mechanism is used to cache the metadata associated with triggers, rules, and packages, as well as the code and runtime environment associated with actions.
+
+When a function is invoked, OpenWhisk first checks if the metadata associated with the function is available in the datastore cache. If it is, OpenWhisk retrieves the cached metadata instead of making a request to the data store, which can significantly reduce the latency of function invocations. Similarly, when a function is first invoked, OpenWhisk caches the function's code and runtime environment in the datastore cache, so that subsequent invocations of the function can be executed more quickly.
+
+It's worth noting that the datastore cache in OpenWhisk is not configurable by users, as it is implemented by Apache CouchDB and is automatically used by OpenWhisk as part of its runtime environment.
+
+### ShardingContainerPoolBalancer 
+A loadbalancer that schedules workload based on a hashing-algorithm.
+Reference : [https://github.com/adobe-apiplatform/incubator-openwhisk/blob/master/core/controller/src/main/scala/org/apache/openwhisk/core/loadBalancer/ShardingContainerPoolBalancer.scala](https://github.com/adobe-apiplatform/incubator-openwhisk/blob/master/core/controller/src/main/scala/org/apache/openwhisk/core/loadBalancer/ShardingContainerPoolBalancer.scala)
+ 
+  ## Algorithm
+ 
+  At first, for every namespace + action pair a hash is calculated and then an invoker is picked based on that hash
+  (`hash % numInvokers`). The determined index is the so called "home-invoker". This is the invoker where the following
+  progression will **always** start. If this invoker is healthy (see "Invoker health checking") and if there is
+  capacity on that invoker (see "Capacity checking"), the request is scheduled to it.
+ 
+  If one of these prerequisites is not true, the index is incremented by a step-size. The step-sizes available are the
+  all coprime numbers smaller than the amount of invokers available (coprime, to minimize collisions while progressing
+  through the invokers). The step-size is picked by the same hash calculated above (`hash & numStepSizes`). The
+  home-invoker-index is now incremented by the step-size and the checks (healthy + capacity) are done on the invoker
+  we land on now.
+ 
+  This procedure is repeated until all invokers have been checked at which point the "overload" strategy will be
+  employed, which is to choose a healthy invoker randomly. In a steadily running system, that overload means that there
+  is no capacity on any invoker left to schedule the current request to.
+ 
+  If no invokers are available or if there are no healthy invokers in the system, the loadbalancer will return an error
+  stating that no invokers are available to take any work. Requests are not queued anywhere in this case.
+ 
+  An example:
+  - availableInvokers: 10 (all healthy)
+  - hash: 13
+  - homeInvoker: hash % availableInvokers = 13 % 10 = 3
+  - stepSizes: 1, 3, 7 (note how 2 and 5 is not part of this because it's not coprime to 10)
+  - stepSizeIndex: hash % numStepSizes = 13 % 3 = 1 => stepSize = 3
+ 
+  Progression to check the invokers: 3, 6, 9, 2, 5, 8, 1, 4, 7, 0 --> done
+ 
+  This heuristic is based on the assumption, that the chance to get a warm container is the best on the home invoker
+  and degrades the more steps you make. The hashing makes sure that all loadbalancers in a cluster will always pick the
+  same home invoker and do the same progression for a given action.
+ 
+  Known caveats:
+  - This assumption is not always true. For instance, two heavy workloads landing on the same invoker can override each
+    other, which results in many cold starts due to all containers being evicted by the invoker to make space for the
+    "other" workload respectively. Future work could be to keep a buffer of invokers last scheduled for each action and
+    to prefer to pick that one. Then the second-last one and so forth.
+ 
+  ## Capacity checking
+ 
+  The maximum capacity per invoker is configured using `user-memory`, which is the maximum amount of memory of actions
+  running in parallel on that invoker.
+ 
+  Spare capacity is determined by what the loadbalancer thinks it scheduled to each invoker. Upon scheduling, an entry
+  is made to update the books and a slot for each MB of the actions memory limit in a Semaphore is taken. These slots
+  are only released after the response from the invoker (active-ack) arrives **or** after the active-ack times out.
+  The Semaphore has as many slots as MBs are configured in `user-memory`.
+ 
+  Known caveats:
+  - In an overload scenario, activations are queued directly to the invokers, which makes the active-ack timeout
+    unpredictable. Timing out active-acks in that case can cause the loadbalancer to prematurely assign new load to an
+    overloaded invoker, which can cause uneven queues.
+  - The same is true if an invoker is extraordinarily slow in processing activations. The queue on this invoker will
+    slowly rise if it gets slow to the point of still sending pings, but handling the load so slowly, that the
+    active-acks time out. The loadbalancer again will think there is capacity, when there is none.
+ 
+  Both caveats could be solved in future work by not queueing to invoker topics on overload, but to queue on a
+  centralized overflow topic. Timing out an active-ack can then be seen as a system-error, as described in the
+  following.
+ 
+  ## Invoker health checking
+ 
+  Invoker health is determined via a kafka-based protocol, where each invoker pings the loadbalancer every second. If
+  no ping is seen for a defined amount of time, the invoker is considered "Offline".
+ 
+  Moreover, results from all activations are inspected. If more than 3 out of the last 10 activations contained system
+  errors, the invoker is considered "Unhealthy". If an invoker is unhealthy, no user workload is sent to it, but
+  test-actions are sent by the loadbalancer to check if system errors are still happening. If the
+  system-error-threshold-count in the last 10 activations falls below 3, the invoker is considered "Healthy" again.
+ 
+  To summarize:
+  - "Offline": Ping missing for > 10 seconds
+  - "Unhealthy": > 3 **system-errors** in the last 10 activations, pings arriving as usual
+   "Healthy": < 3 **system-errors** in the last 10 activations, pings arriving as usual
+ 
+  ## Horizontal sharding
+ 
+  Sharding is employed to avoid both loadbalancers having to share any data, because the metrics used in scheduling
+  are very fast changing.
+ 
+  Horizontal sharding means, that each invoker's capacity is evenly divided between the loadbalancers. If an invoker
+  has at most 16 slots available (invoker-busy-threshold = 16), those will be divided to 8 slots for each loadbalancer
+  (if there are 2).
+ 
+  If concurrent activation processing is enabled (and concurrency limit is > 1), accounting of containers and
+  concurrency capacity per container will limit the number of concurrent activations routed to the particular
+  slot at an invoker. Default max concurrency is 1.
+ 
+  Known caveats:
+  - If a loadbalancer leaves or joins the cluster, all state is removed and created from scratch. Those events should
+    not happen often.
+  - If concurrent activation processing is enabled, it only accounts for the containers that the current loadbalancer knows.
+    So the actual number of containers launched at the invoker may be less than is counted at the loadbalancer, since
+    the invoker may skip container launch in case there is concurrent capacity available for a container launched via
+    some other loadbalancer.
+ 
 
 **TODO** : check all AFFINITIES!
