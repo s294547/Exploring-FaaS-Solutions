@@ -33,6 +33,16 @@
 	7. [ Deploy the code ](#deploy-the-code)
 	8. [Run the function in Azure](#Run-the-function-in-azure)
 	9. [Connect to storage](#connect-to-storage)
+	10. [Delete a Function](#delete-a-function)
+4. [Monitor executions in Azure Functions](#monitor-executions-in-azure-functions)
+5. [Add on](#add-on)
+	1. [Event Hubs and IoT Hub Triggers](#event-hubs-and-iot-hub-triggers) 
+	2. [EventProcessorHost](#eventprocessorhost)  
+	3. [Resource Group](#resource-group)  
+	4. [Azure Storage Account](#azure-storage-account)  
+	5. [Function App](#function-app)  
+	6. [Azure Application Insights](#azure-application-insights) 
+	6. [Azure Monitor](#azure-monitor)
 
 ## Introduction
 
@@ -228,6 +238,12 @@ The unit of scale for Azure Functions is the function app. When the function app
 
 [scale-controller](./scale-controller.png)
 
+**Cold Start**
+
+After your function app has been idle for a number of minutes, the platform may scale the number of instances on which your app runs down to zero. The next request has the added latency of scaling from zero to one. This latency is referred to as a cold start. The number of dependencies required by your function app can affect the cold start time. Cold start is more of an issue for synchronous operations, such as HTTP triggers that must return a response. If cold starts are impacting your functions, consider running in a Premium plan or in a Dedicated plan with the Always on setting enabled.
+
+[reference](https://learn.microsoft.com/en-us/azure/azure-functions/event-driven-scaling)
+
 **Scaling behaviors**
 
 Scaling can vary on a number of factors, and scale differently based on the trigger and language selected. There are a few intricacies of scaling behaviors to be aware of:
@@ -237,7 +253,36 @@ Scaling can vary on a number of factors, and scale differently based on the trig
 
 **Limit scale out**
 
-You may wish to restrict the maximum number of instances an app used to scale out. This is most common for cases where a downstream component like a database has limited throughput. By default, Consumption plan functions scale out to as many as 200 instances, and Premium plan functions will scale out to as many as 100 instances. You can specify a lower maximum for a specific app by modifying the functionAppScaleLimit value. The functionAppScaleLimit can be set to 0 or null for unrestricted, or a valid value between 1 and the app maximum.
+You may wish to restrict the maximum number of instances an app used to scale out. This is most common for cases where a downstream component like a database has limited throughput. By default, Consumption plan functions scale out to as many as 200 instances, and Premium plan functions will scale out to as many as 100 instances. You can specify a lower maximum for a specific app by modifying the *functionAppScaleLimit* value. The *functionAppScaleLimit* can be set to 0 or null for unrestricted, or a valid value between 1 and the app maximum.
+
+**Scale-in behaviors**
+Event-driven scaling automatically reduces capacity when demand for your functions is reduced. It does this by shutting down worker instances of your function app. Before an instance is shut down, new events stop being sent to the instance. Also, functions that are currently executing are given time to finish executing. This behavior is logged as drain mode. This shut-down period can extend up to 10 minutes for Consumption plan apps and up to 60 minutes for Premium plan apps. Event-driven scaling and this behavior don't apply to Dedicated plan apps.
+
+The following considerations apply for scale-in behaviors:
+
+For Consumption plan function apps running on Windows, only apps created after May 2021 have drain mode behaviors enabled by default.
+To enable graceful shutdown for functions using the Service Bus trigger, use version 4.2.0 or a later version of the Service Bus Extension.
+
+**Event Hubs triggers**
+This section describes how scaling behaves when your function uses an [*Event Hubs trigger* or an *IoT Hub trigger*](#event-hubs-and-iot-hub-triggers). In these cases, each instance of an event triggered function is backed by a single *EventProcessorHost* instance. The trigger (powered by Event Hubs) ensures that only one [*EventProcessorHost*](#eventprocessorhost) instance can get a lease on a given partition.
+
+For example, consider an event hub as follows:
+
+10 partitions
+1,000 events distributed evenly across all partitions, with 100 messages in each partition
+
+When your function is first enabled, there's only one instance of the function. Let's call the first function instance *Function_0*. The *Function_0* function has a single instance of *EventProcessorHost* that holds a lease on all 10 partitions. This instance is reading events from partitions 0-9. From this point forward, one of the following happens:
+
+1. New function instances are not needed: *Function_0* is able to process all 1,000 events before the Functions scaling logic take effect. In this case, all 1,000 messages are processed by *Function_0*.
+2. An additional function instance is added: If the Functions scaling logic determines that *Function_0* has more messages than it can process, a new function app instance (*Function_1*) is created. This new function also has an associated instance of EventProcessorHost. As the underlying event hub detects that a new host instance is trying read messages, it load balances the partitions across the host instances. For example, partitions 0-4 may be assigned to *Function_0* and partitions 5-9 to *Function_1*.
+
+3. N more function instances are added: If the Functions scaling logic determines that both *Function_0* and *Function_1* have more messages than they can process, new *Functions_N* function app instances are created. Apps are created to the point where N is greater than the number of event hub partitions. In our example, Event Hubs again load balances the partitions, in this case across the instances *Function_0*...*Functions_9*.
+
+As scaling occurs, N instances is a number greater than the number of event hub partitions. This pattern is used to ensure *EventProcessorHost* instances are available to obtain locks on partitions as they become available from other instances. You're only charged for the resources used when the function instance executes. In other words, you aren't charged for this over-provisioning.
+
+When all function execution completes (with or without errors), checkpoints are added to the associated storage account. When check-pointing succeeds, all 1,000 messages are never retrieved again.
+
+[reference](https://learn.microsoft.com/en-us/azure/azure-functions/event-driven-scaling)
 
 **Azure Functions scaling in an App service plan**
 
@@ -559,10 +604,10 @@ Provide the following information at the prompts:
 
 When completed, the following Azure resources are created in your subscription, using names based on your function app name:
 
-1. A resource group, which is a logical container for related resources.
-2. A standard Azure Storage account, which maintains state and other information about your projects.
-3. A consumption plan, which defines the underlying host for your serverless function app.
-4. A function app, which provides the environment for executing your function code. A function app lets you group functions as a logical unit for easier management, deployment, and sharing of resources within the same hosting plan.
+1. A [resource group](#resource-group), which is a logical container for related resources.
+2. A standard [Azure Storage account](#azure-storage-account), which maintains state and other information about your projects.
+3. A [consumption plan](#compare-azure-functions-hosting-options), which defines the underlying host for your serverless function app.
+4. A [function app](#function-app), which provides the environment for executing your function code. A function app lets you group functions as a logical unit for easier management, deployment, and sharing of resources within the same hosting plan.
 5. An Application Insights instance connected to the function app, which tracks usage of your serverless function.
 
 TBD: approfondire questi elementi
@@ -712,3 +757,122 @@ Choose the function app that you created in the first section. Because you're re
 After the deployment completes, you can again use the *Execute Function Now...* feature to trigger the function in Azure.
 
 Again view the message in the storage queue to verify that the output binding generates a new message in the queue.
+
+[reference](https://learn.microsoft.com/en-us/azure/azure-functions/functions-add-output-binding-storage-queue-vs-code?pivots=programming-language-csharp&tabs=in-process)
+
+### Delete a Function
+
+In Azure, resources refer to function apps, functions, storage accounts, and so forth. They're grouped into resource groups, and you can delete everything in a group by deleting the group.
+
+You've created resources to have a function running. You may be billed for these resources, depending on your account status and service pricing. If you don't need the resources anymore, here's how to delete them:
+
+In Visual Studio Code, press F1 to open the command palette. In the command palette, search for and select Azure: Open in portal.
+
+Choose your function app and press Enter. The function app page opens in the Azure portal.
+
+In the Overview tab, select the named link next to Resource group.
+
+Screenshot of select the resource group to delete from the function app page.
+
+On the Resource group page, review the list of included resources, and verify that they're the ones you want to delete.
+
+Select *Delete resource group*, and follow the instructions.
+
+Deletion may take a couple of minutes. When it's done, a notification appears for a few seconds. You can also select the bell icon at the top of the page to view the notification.
+
+## Monitor executions in Azure Functions
+
+Azure Functions offers built-in integration with [Azure Application Insights](#azure-application-insights) to monitor functions executions. This article provides an overview of the monitoring capabilities provided by Azure for monitoring Azure Functions.
+
+Application Insights collects log, performance, and error data. By automatically detecting performance anomalies and featuring powerful analytics tools, you can more easily diagnose issues and better understand how your functions are used. These tools are designed to help you continuously improve performance and usability of your functions. You can even use Application Insights during local function app project development. For more information, see What is Application Insights?.
+
+As Application Insights instrumentation is built into Azure Functions, you need a valid instrumentation key to connect your function app to an Application Insights resource. The instrumentation key is added to your application settings as you create your function app resource in Azure. If your function app doesn't already have this key, you can set it manually.
+
+You can also monitor the function app itself by using [Azure Monitor](#azure-monitor).
+
+## Add on
+
+### Event Hubs and IoT Hub Triggers
+
+Event Hubs and IoT Hub are two different services offered by Azure for handling streaming data. Both services can be used as triggers in Azure Functions.
+
+An Event Hubs trigger allows you to read messages from an Azure Event Hub in real-time. Azure Event Hubs is a highly scalable and highly available event processing service that can ingest millions of events per second. With an Event Hubs trigger, you can process these events as they arrive, allowing you to build real-time data processing applications.
+
+An IoT Hub trigger, on the other hand, allows you to read messages from an Azure IoT Hub. Azure IoT Hub is a fully managed service that enables reliable and secure bi-directional communications between IoT devices and the cloud. With an IoT Hub trigger, you can process messages from IoT devices as they arrive in the cloud, enabling you to build IoT solutions that can react to changes in real-time.
+
+Both triggers can be used in Azure Functions to execute a piece of code in response to incoming messages from Event Hubs or IoT Hub. This code can be written in a variety of languages, including C#, Java, Python, and Node.js, and can be hosted in a serverless environment provided by Azure Functions.
+
+[reference](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-event-iot-trigger?tabs=in-process%2Cfunctionsv2%2Cextensionv5&pivots=programming-language-csharp)
+[reference](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-event-hubs-trigger?tabs=in-process%2Cfunctionsv2%2Cextensionv5&pivots=programming-language-csharp)
+
+### EventProcessorHost
+
+EventProcessorHost is a class in the Azure Event Hubs library that provides a higher-level abstraction for processing events from an Azure Event Hub. It simplifies the process of reading events from a partitioned event stream and provides features such as load balancing, checkpointing, and automatic recovery from failures.
+
+When you use EventProcessorHost, you define an event handler method that will be called for each event that is received from the event hub. The EventProcessorHost will then take care of creating an event processor for each partition of the event stream and distributing the partitions across multiple instances of your application to ensure high availability and scalability.
+
+The EventProcessorHost also includes a checkpointing mechanism that allows you to save the position of the last processed event for each partition. This way, if your application crashes or is restarted, it can resume processing events from where it left off instead of reprocessing events that have already been processed.
+
+Overall, EventProcessorHost provides a simple and reliable way to process events from Azure Event Hubs at scale, without having to manage low-level details such as partitioning, load balancing, and checkpointing.
+
+[reference](#https://learn.microsoft.com/it-it/azure/event-hubs/event-hubs-event-processor-host)
+
+### Resource Group
+
+A resource group is a container that holds related resources for an Azure solution. The resource group can include all the resources for the solution, or only those resources that you want to manage as a group. You decide how you want to allocate resources to resource groups based on what makes the most sense for your organization. Generally, add resources that share the same lifecycle to the same resource group so you can easily deploy, update, and delete them as a group.
+
+The resource group stores metadata about the resources. Therefore, when you specify a location for the resource group, you are specifying where that metadata is stored. For compliance reasons, you may need to ensure that your data is stored in a particular region.
+
+[reference](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal)
+
+### Azure Storage Account
+
+An Azure storage account contains all of your Azure Storage data objects, including blobs, file shares, queues, tables, and disks. The storage account provides a unique namespace for your Azure Storage data that's accessible from anywhere in the world over HTTP or HTTPS. Data in your storage account is durable and highly available, secure, and massively scalable.
+
+[reference](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-overview)
+
+### Function App
+
+A function app provides an execution context in Azure in which your functions run. As such, it is the unit of deployment and management for your functions. A function app is composed of one or more individual functions that are managed, deployed, and scaled together. All of the functions in a function app share the same pricing plan, deployment method, and runtime version. Think of a function app as a way to organize and collectively manage your functions.
+
+### Azure Application Insights
+Application Insights is an extension of Azure Monitor and provides Application Performance Monitoring (also known as “APM”) features. APM tools are useful to monitor applications from development, through test, and into production in the following ways:
+
+- Proactively understand how an application is performing.
+- Reactively review application execution data to determine the cause of an incident.
+- In addition to collecting Metrics and application Telemetry data, which describe application activities and health, Application Insights can also be used to collect and store application trace logging data.
+
+The log trace is associated with other telemetry to give a detailed view of the activity. Adding trace logging to existing apps only requires providing a destination for the logs; the logging framework rarely needs to be changed.
+
+Application Insights provides other features including, but not limited to:
+
+1. *Live Metrics* – observe activity from your deployed application in real time with no effect on the host environment
+2. *Availability* – also known as “Synthetic Transaction Monitoring”, probe your applications external endpoint(s) to test the overall availability and responsiveness over time
+3. *GitHub or Azure DevOps integration* – create GitHub or Azure DevOps work items in context of Application Insights data
+Usage – understand which features are popular with users and how users interact and use your application
+4. *Smart Detection* – automatic failure and anomaly detection through proactive telemetry analysis
+
+In addition, Application Insights supports Distributed Tracing, also known as “distributed component correlation”. This feature allows searching for and visualizing an end-to-end flow of a given execution or transaction. The ability to trace activity end-to-end is increasingly important for applications that have been built as distributed components or microservices.
+
+The Application Map allows a high level top-down view of the application architecture and at-a-glance visual references to component health and responsiveness.
+
+[reference](https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview?tabs=net)
+
+### Azure Monitor
+
+Azure Monitor is a service provided by Microsoft Azure that helps you maximize the performance and availability of your applications and services running on Azure. It provides a comprehensive monitoring solution that can collect data from a variety of sources and provide insights into the health and performance of your applications, infrastructure, and network.
+
+Azure Monitor collects and analyzes telemetry data from different sources such as application logs, metrics, and events from Azure services and virtual machines. It also supports custom data sources through the use of Application Insights, Log Analytics, and other monitoring tools.
+
+Azure Monitor provides a centralized dashboard that allows you to view and analyze the collected data in real-time. You can use it to visualize performance metrics, track application and infrastructure availability, and get alerts when issues are detected.
+
+Some key features of Azure Monitor include:
+
+- Metrics Explorer: Allows you to visualize and analyze metrics collected from Azure services and virtual machines.
+- Log Analytics: Provides a powerful query language for searching and analyzing log data from various sources.
+- Application Insights: Provides detailed insights into the performance and usage of your web applications.
+- Alerts: Allows you to set up alert rules to notify you when specific conditions are met.
+
+Overall, Azure Monitor is a powerful and flexible monitoring solution that provides comprehensive insights into the health and performance of your applications and services running on Azure.
+
+[reference](https://learn.microsoft.com/en-us/azure/azure-monitor/overview)
