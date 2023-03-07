@@ -1,0 +1,13 @@
+configurazione: credenziali servizio segreto azure functions
+devo fare u
+parametri di avvio --> puntamento, valore stringa generica + un parametro di tipo segreto, devo trovare un modo per mettere insieme queste cose in maniera scalabile. 
+questa faas deve girare con questi param, sia secret che non --> come gestisco questa configurazione?
+
+casi d'uso: misurazione temperature, umidità data center
+		temperature - umidità agricoltura 
+		sensori sonori
+		
+            casa
+		
+np iot --> protocollo 
+domotic iot faas. 

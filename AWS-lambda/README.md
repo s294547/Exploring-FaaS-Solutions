@@ -533,7 +533,7 @@ The console creates a Lambda function with a single source file named index.js. 
 
 [reference](https://github.com/awsdocs/aws-lambda-developer-guide/blob/main/doc_source/lambda-nodejs.md)
 
-### AWS Lambda with AWS IoT
+## AWS Lambda with AWS IoT
 
 AWS IoT provides secure communication between internet-connected devices (such as sensors) and the AWS Cloud. This makes it possible for you to collect, store, and analyze telemetry data from multiple devices.
 
