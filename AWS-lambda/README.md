@@ -1,4 +1,4 @@
-# AWS LAMBDA
+# AWS LAMBDAS
 
 <div style="margin-left: auto;
             margin-right: auto;
@@ -25,6 +25,7 @@
 		4. [Amazon Kinesis](#amazon-kinesis)
 		5. [AWS Identity and Access Management (IAM)](#aws-iam)
 		6. [Amazon CloudWatch](#amazon-cloudwatch)
+		7. [AWS IoT Core](#aws-iot-core)
 3. [AWS Lambda](#aws-lambda)
 	1. [Overview](#overview-1)
 	2. [Lambda Concepts](#lambda-concepts)
@@ -177,6 +178,15 @@ IP addresses enable resources in your VPC to communicate with each other and wit
 Amazon CloudWatch is a monitoring and management service that provides data and actionable insights for AWS, hybrid, and on-premises applications and infrastructure resources. You can collect and access all your performance and operational data in the form of logs and metrics from a single platform rather than monitoring them in silos (server, network, or database). CloudWatch enables you to monitor your complete stack (applications, infrastructure, network, and services) and use alarms, logs, and events data to take automated actions and reduce mean time to resolution (MTTR). This frees up important resources and allows you to focus on building applications and business value.
 
 [reference](https://aws.amazon.com/cloudwatch/features/)
+
+#### AWS IoT Core
+
+AWS IoT Core lets you connect billions of IoT devices and route trillions of messages to AWS services without managing infrastructure.
+
+This is the service that the devices directly connect to, for transmitting data. It allows for several communication protocols like MQTT, HTTPS, MQTT over WebSocket, and even LoRaWAN. And the communication is secured with end-to-end encryption and also authentication. Once the data is received by the IoT Core, you can define rules to transfer it forward to other services (like lambda), or take some action based on that data.
+
+[iot-core](./iot-core.png)
+[reference](https://aws.amazon.com/iot-core/?nc=sn&loc=2&dn=3)
 
 ## AWS Lambda
 
