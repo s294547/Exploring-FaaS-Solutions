@@ -42,6 +42,9 @@ spec:
         - name: internal
           containerPort: 9000
           protocol: TCP
+        - name: mqtt
+          containerPort: 8883
+          protocol: TCP
 {{- if .Values.deploy.resources }}
         resources:
     {{- .Values.deploy.resources | toYaml | nindent 10 }}

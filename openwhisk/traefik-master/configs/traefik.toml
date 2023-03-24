@@ -33,6 +33,14 @@
 [entryPoints.internal]
   address = ":9000"
 
+[entryPoints.mqtt]
+  address = ":8883"
+  [entryPoints.mqtt.http.tls]
+  {{- if .Values.traefik.letsencrypt }}
+    certResolver = "letsencrypt"
+  {{- end }}
+
+
 [accessLog]
   filePath = "/var/log/access.log"
 

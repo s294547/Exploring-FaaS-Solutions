@@ -18,6 +18,10 @@ spec:
     port: {{ .Values.traefik.entrypoints.secure.port }}
     protocol: TCP
     targetPort: https
+  - name: mqtt
+    port: {{ .Values.traefik.entrypoints.mqtt.port }}
+    protocol: TCP
+    targetPort: mqtt
   selector: {{ include "app.labels" . | nindent 4 }}
     app.kubernetes.io/component: traefik
 ---

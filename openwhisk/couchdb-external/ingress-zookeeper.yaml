@@ -1,0 +1,16 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: kafka-zookeeper
+  labels:
+    app: kafka-zookeeper
+spec:
+  routes:
+  - kind: Rule
+    match: Host(`zookeeper-gateway.liquidfaas.cloud`)
+    services:
+    - kind: Service
+      name: kafka-external-zookeeper
+      namespace: kafka-external
+      port: 2181
+

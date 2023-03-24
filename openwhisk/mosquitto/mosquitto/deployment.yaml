@@ -1,0 +1,63 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mosquitto
+  # Change if you want to deploy to somewhere other then default
+  namespace: mosquitto
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosquitto
+  # Change if you want to deploy to somewhere other then default
+  namespace: mosquitto
+  labels:
+    app: mosquitto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+    spec:
+      serviceAccountName: mosquitto
+      containers:
+        - image: eclipse-mosquitto
+          imagePullPolicy: IfNotPresent
+          name: mosquitto
+          securityContext:
+            capabilities:
+                drop:
+                  - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          readinessProbe:
+            tcpSocket:
+              port: mqtt
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 1883
+              name: mqtt
+          volumeMounts:
+            - name: mosquitto-config
+              mountPath: /mosquitto/config
+            - mountPath: /mosquitto/log
+              name: mosquitto-log
+            - mountPath: /mosquitto/data
+              name: mosquitto-data
+      volumes:
+        - name: mosquitto-config
+          configMap:
+            name: mosquitto-config
+        - name: mosquitto-log
+          persistentVolumeClaim:
+            claimName: mosquitto-log
+        - name: mosquitto-data
+          persistentVolumeClaim:
+            claimName: mosquitto-data

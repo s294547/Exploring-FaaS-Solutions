@@ -9,7 +9,7 @@ spec:
   - https
   routes:
   - kind: Rule
-    match: Host(`traefik.{{ .Values.global.domain_name }}`)
+    match: Host(`traefik-gw.{{ .Values.global.domain_name }}`)
     services:
     - kind: TraefikService
       name: api@internal

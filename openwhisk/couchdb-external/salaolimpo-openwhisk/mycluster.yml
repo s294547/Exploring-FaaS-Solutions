@@ -1,0 +1,26 @@
+whisk:
+  ingress:
+    type: NodePort
+    apiHostName: 194.35.120.117
+    apiHostPort: 31001
+ 
+nginx:
+  httpsNodePort: 31001
+
+# Database configuration
+db:
+  external: true
+  host: "couchdb-gateway.liquidfaas.cloud"
+  protocol: "https"
+  auth:
+    username: "admin"
+    password: "password"
+  # Should we run a Job to wipe and re-initialize the database when the chart is deployed?
+  # This should always be true if external is false.
+  wipeAndInit: false
+  port: 443
+
+providers:
+  # Kafka provider configurations
+  kafka:
+    enabled: false

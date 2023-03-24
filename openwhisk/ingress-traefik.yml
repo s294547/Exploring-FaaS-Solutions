@@ -1,0 +1,15 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik
+  labels:
+    app: traefik
+spec:
+  routes:
+  - kind: Rule
+    match: Host(`traefik.liquidfaas.cloud`)
+    services:
+    - kind: Service
+      name: traefik
+      namespace: traefik
+      port: 80

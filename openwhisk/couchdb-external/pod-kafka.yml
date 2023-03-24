@@ -1,0 +1,113 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2023-03-13T13:22:47Z"
+  generateName: openwhisk-kafkaprovider-6685949cc9-
+  name: openwhisk-kafkaprovider-6685949cc9-qw5xi
+  namespace: openwhisk
+  resourceVersion: "443726"
+  uid: 5ce2d901-a19e-476d-b13a-8c4684650cd3
+spec:
+  containers:
+  - env:
+    - name: DB_URL
+      value: https://couchdb-gateway.liquidfaas.cloud:443
+    - name: DB_USER
+      value: admin
+    - name: DB_PASS
+      value: password
+    - name: DB_PREFIX
+      value: kp
+    - name: LOCAL_DEV
+      value: "true"
+    - name: KAFKA_SECURITY_PROTOCOL
+      value: "SSL"
+    - name: KAFKA_SSL_ENABLED_PROTOCOLS
+      value: "TLSv1.2"
+    - name: ROUTER_HOST
+      valueFrom:
+        configMapKeyRef:
+          key: whisk_api_host_nameAndPort
+          name: openwhisk-whisk.config
+    - name: ENDPOINT_AUTH
+      valueFrom:
+        configMapKeyRef:
+          key: whisk_api_host_nameAndPort
+          name: openwhisk-whisk.config
+    image: openwhisk/kafkaprovider:2.1.0
+    # `shell -c` evaluates a string as shell input
+    command: [ "sh", "-c"]
+    # loop forever, outputting "yo" every 5 seconds
+    args: ["while true; do sleep 5; done;"]
+    imagePullPolicy: IfNotPresent
+    name: kafkaprovider
+    ports:
+    - containerPort: 8080
+      name: kafkaprovider
+      protocol: TCP
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-xqz9w
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  initContainers:
+  - command:
+    - sh
+    - -c
+    - 'result=1; until [ $result -eq 0 ]; do echo ''Checking controller readiness'';
+      wget -T 5 --spider $READINESS_URL; result=$?; sleep 1; done; echo ''Success:
+      controller is ready'''
+    env:
+    - name: READINESS_URL
+      value: http://openwhisk-controller.openwhisk.svc.cluster.local:8080/ping
+    image: busybox:latest
+    imagePullPolicy: IfNotPresent
+    name: wait-for-controller
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-xqz9w
+      readOnly: true
+  nodeName: liquidfaas.cloud
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-xqz9w
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
