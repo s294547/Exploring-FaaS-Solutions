@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name Sensor_Gas)(type Legacy)(uri ${KIPRJMOD}/Sensor_Gas.lib)(options "")(descr ""))
+  (lib (name ESP8266)(type Legacy)(uri ${KIPRJMOD}/ESP8266.lib)(options "")(descr ""))
+)

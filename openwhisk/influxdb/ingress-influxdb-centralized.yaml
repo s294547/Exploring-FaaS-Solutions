@@ -1,0 +1,16 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: influxdb
+  labels:
+    app: influxdb
+spec:
+  routes:
+  - kind: Rule
+    match: Host(`influxdb-centralized-gateway.liquidfaas.cloud`)
+    services:
+    - kind: Service
+      name: influxdb-centralized-influxdb2
+      namespace: influxdb-centralized
+      port: 80
+

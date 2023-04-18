@@ -4,7 +4,7 @@ kind: ServiceAccount
 metadata:
   name: mosquitto
   # Change if you want to deploy to somewhere other then default
-  namespace: mosquitto
+
 
 ---
 apiVersion: apps/v1
@@ -12,9 +12,10 @@ kind: Deployment
 metadata:
   name: mosquitto
   # Change if you want to deploy to somewhere other then default
-  namespace: mosquitto
+
   labels:
     app: mosquitto
+    name: mosquitto
 spec:
   replicas: 1
   selector:
@@ -24,6 +25,7 @@ spec:
     metadata:
       labels:
         app: mosquitto
+        name: mosquitto
     spec:
       serviceAccountName: mosquitto
       containers:

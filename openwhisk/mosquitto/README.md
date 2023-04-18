@@ -17,11 +17,14 @@
 3. [Create the publisher and  subscriber pods](#create-the-publisher-and-subscriber-pods)
 
 ## Introduction
-In this file I am going to show all the steps provided to deploy a mosquitto MQTT broker on my kuberneets cluster and to create two pods running an example of publisher and subscriber. 
+In this file I am going to show all the steps provided to deploy a mosquitto MQTT broker on my kuberneets cluster and to create two pods running an example of publisher and subscriber. We will find all the related data in the folders [mosquitto](./mosquitto/), [publisher](./publisher/) and [subscriber](./subscriber).
 
 Since this thesis is focused on the field of fog computing, we can assume that this steps have to be replicated for each cluster: each cluster will have its own MQTT broker, and all the sensors in this data center will publish their data to it. 
 
 Since the usage of the MQTT broker will be limited inside the cluster, the version of the MQTT protocol is the basic one, not the one over TLS/SSL. 
+
+All the informations related to how implement the trigger that is fired when a new message is published on a given topic will be in the folder [openwhisk_mqtt_feed](./openwhisk_mqtt_feed/).
+
 
 ## Deploying Mosquitto
 

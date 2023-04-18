@@ -48,6 +48,10 @@
 
 This file will contain all the retrieved informations about Microsoft Azure and, in particular, about microsoft azure functions. 
 
+In this folder contains another folder:
+1. [IoT](./IoT/): this folder has all the data/informations related on how to connect a device to Azure IoT Hub and trigger a function when a some data is published by the given device.
+
+
 ## Microsoft Azure
 
 ### Overview
@@ -81,7 +85,7 @@ The Azure portal is a web-based, unified console that provides an alternative to
 3. Configure accessibility options for an optimal experience.
 The Azure portal is designed for resiliency and continuous availability. It maintains a presence in every Azure datacenter. This configuration makes the Azure portal resilient to individual datacenter failures and avoids network slowdowns by being close to users. The Azure portal updates continuously and requires no downtime for maintenance activities.
 
-[azure-portal](./azure-portal.png)
+[azure-portal](./images/azure-portal.png)
 
 ### Microsoft Azure Services
 
@@ -173,7 +177,7 @@ Examples:
 
 [3](https://learn.microsoft.com/en-us/training/modules/intro-to-azure-fundamentals/tour-of-azure-services)
 
-[azure-services](./azure-services.png)
+[azure-services](./images/azure-services.png)
 
 ### Azure Account
 
@@ -181,7 +185,7 @@ To create and use Azure services, you need an Azure subscription. When you're wo
 In any subscription, you can create resource groups, which contain a set of resources. 
 
 [4](https://learn.microsoft.com/en-us/training/modules/intro-to-azure-fundamentals/get-started-with-azure-accounts)
-[azure-accounts](./azure-account.png)
+[azure-accounts](./images/azure-account.png)
 
 ## Azure Functions 
 
@@ -236,7 +240,7 @@ Azure Functions uses a component called the **scale controller** to monitor the 
 
 The unit of scale for Azure Functions is the function app. When the function app is scaled out, additional resources are allocated to run multiple instances of the Azure Functions host. Conversely, as compute demand is reduced, the scale controller removes function host instances. The number of instances is eventually "scaled in" to zero when no functions are running within a function app.
 
-[scale-controller](./scale-controller.png)
+[scale-controller](./images/scale-controller.png)
 
 **Cold Start**
 

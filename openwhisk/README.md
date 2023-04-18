@@ -38,11 +38,28 @@
 	1. [ShardingContainerPoolBalancer](#shardingcontainerpoolbalancer)
 
 ## Introduction
+
 This file will document all the steps required to deploy OpenWhisk on a given Kubernetes Cluster.
 This example was done using Docker Desktop on Windows 11 with Ubuntu 22 WSL 2. 
 It will also be reported an example of how to create an action in OpenWhisk. 
 
-The repository up to now will just keep the code of the created action *helloWorldAction.js* and an example of **mycluster.yml**.  
+Considering this folder, it contains all the informations related to how our openwhisk instance has been deployed and what components I needed to add progressively to develop my thesis.
+
+In particular, we can see other folders inside this one:
+1. [cert](./cert/): it contains openwhisk certificates.
+2. [cli](./cli/): it contains the openwhisk cli.
+3. [traefik-master](./traefik-master/): it contains the helm chart to deploy traefik on my cluster.
+4. [openwhisk-deploy-kube](./openwhisk-deploy-kube/): it contains the helm chart to deploy openwhisk, opportunely modified for our use case.
+5. [IoT protocols](./IoT%20protocols/): it contains the process followed to decide how to implement the trigger that is fired when data are published on an MQTT topic.
+6. [influxdb](./influxdb/): it contain the informations about how to deploy an influxdb instance.
+7. [mosquitto]: it contains all the informations and data related to the MQTT broker deployed inside each cluster and  the trigger which is fired when data are published on an MQTT topic.
+8. [fixing-nodejsaction](./fixing-nodejsaction/): it contains the information regarding how the runtime for nodejs has been fixed in this openwhisk instance.
+9. [couchdb-external](./couchdb-external/): it contains the informations and the data to deploy an external couchdb instance in our openwhisk instance, which is shared between the different openwhisk local instances.
+10. [compute_daily_aggregates](./compute_daily_aggregates/): it contains the informations and data used to develop an openwhisk action that is fired periodically, it computes some local aggregates and sends them to a centralized InfluxDB instance.
+11. [deploy-multiple-instances](./deploy-multiple-instances/): it contains all the informations, decisions and the whole process followed to adapt all the experimented tools in a multiple-instance design. I've first experimented the solution on a single openwhisk instance to see if it was working, then I extended it in a multiple-instance design, exploiting different kubernetes namespaces. 
+12. [arduino-project](./arduino-project/): it contains the arduino project developed by me that works on an ESP-8266 provided with  humidity, temperature and gas sensors and publish a message to a given MQTT broker.   
+
+
 
 ## Required Tools Installation
 ### Helm

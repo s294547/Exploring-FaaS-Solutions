@@ -1,0 +1,11 @@
+{
+  "local_url": "https://influxdb-second-instance-gateway.liquidfaas.cloud",
+  "local_token": "TMbozRRUUr1mXE4VAJxOuMfZUAQmncVM",
+  "local_org": "influxdata",
+  "local_bucket": "measure",
+  "central_url": "https://influxdb-centralized-gateway.liquidfaas.cloud",
+  "central_token": "zXURcTp7ZcGr4n8p3RUbLadBfUWK7rH7",
+  "central_org": "influxdata",
+  "central_bucket": "measure",
+  "location": "test_office_second_instance"
+}
