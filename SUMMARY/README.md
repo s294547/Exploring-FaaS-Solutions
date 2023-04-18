@@ -22,7 +22,7 @@ This file will contain a summary of the work developed up to now to write my mas
 
 ## Summary
 
-[arch-add-readings](./archAddReadings.jpg)
+![arch-add-readings](./archAddReadings.jpg)
 
 Let's present our use case: we are supposing to have multiple clusters, in particular multiple data centers, in which we want to monitor the temperature, gas percentual and humidity, so that we can constantly keep track its "health". 
 
@@ -57,7 +57,7 @@ So, to summarize, I would say that the strenghts of this approach in our Fog Com
 
 Overall, leveraging OpenWhisk for edge device monitoring can be optimized for fog computing environments, enabling computation to be confined on the edge clusters and minimizing communication with centralized resources.
 
-[arch-aggregates](./archAggregates.jpg)
+![arch-aggregates](./archAggregates.jpg)
 
 Another functionality has been implementes: some daily aggregates are computed on the collected data for each local cluster and they are finally sent on a InfluxDB database on the centralized cluster. The operation of computing the aggregates is done with an action also in this case and the trigger related to it is fired with an Alarm Provider, which is natively provided when deployin OpenWhisk.
 
