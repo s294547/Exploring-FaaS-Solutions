@@ -25,24 +25,27 @@ function main(params) {
    try{
     const query = `
     from(bucket: "measure")
-    |> range(start: ${yesterday.toISOString()}, stop: ${today.toISOString()})
+    |> range(start: ${today.toISOString()}, stop: ${tomorrow.toISOString()})
     |> filter(fn: (r) => r["_measurement"] == "gas_perc" or r["_measurement"] == "humidity" or r["_measurement"] == "temperature")
     |> filter(fn: (r) => r["_field"] == "value")
+    |> group(columns: ["datacenter_id", "_measurement"])
     |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
     |> yield(name: "mean")
   
     from(bucket: "measure")
-    |> range(start: ${yesterday.toISOString()}, stop: ${today.toISOString()})
+    |> range(start: ${today.toISOString()}, stop: ${tomorrow.toISOString()})
     |> filter(fn: (r) => r["_measurement"] == "gas_perc" or r["_measurement"] == "humidity" or r["_measurement"] == "temperature")
     |> filter(fn: (r) => r["_field"] == "value")
+    |> group(columns: ["datacenter_id", "_measurement"])
     |> aggregateWindow(every: 1d, fn: max, createEmpty: false)
     |> yield(name: "max")
   
   
     from(bucket: "measure")
-    |> range(start: ${yesterday.toISOString()}, stop: ${today.toISOString()})
+    |> range(start: ${today.toISOString()}, stop: ${tomorrow.toISOString()})
     |> filter(fn: (r) => r["_measurement"] == "gas_perc" or r["_measurement"] == "humidity" or r["_measurement"] == "temperature")
     |> filter(fn: (r) => r["_field"] == "value")
+    |> group(columns: ["datacenter_id", "_measurement"])
     |> aggregateWindow(every: 1d, fn: min, createEmpty: false)
     |> yield(name: "min")
     `;
@@ -74,10 +77,16 @@ function main(params) {
         var gas_perc_avg;
         var gas_perc_max;
         var gas_perc_min;
+        var location;
+        var j=0;
   
         rows.forEach(row => {
           const columns = row.split(","); // split the row into an array of columns
           columns.shift();
+          if(j==0 && columns[0]=="mean"){
+            location=columns[5];
+            j++;
+          }
           if(columns[0]=='max'){
             if(columns[7]=='gas_perc')
               gas_perc_max= columns[5];
@@ -95,12 +104,12 @@ function main(params) {
               temperature_min= columns[5];
           }
           if(columns[0]=='mean'){
-            if(columns[7]=='gas_perc')
-              gas_perc_avg= columns[5];
-            if(columns[7]=='humidity')
-              humidity_avg= columns[5];
-            if(columns[7]=='temperature')
-              temperature_avg= columns[5];
+            if(columns[4]=='gas_perc')
+              gas_perc_avg= columns[6];
+            if(columns[4]=='humidity')
+              humidity_avg= columns[6];
+            if(columns[4]=='temperature')
+              temperature_avg= columns[6];
           }
         });
         var tday = today.getTime() * 1000000;
@@ -108,9 +117,10 @@ function main(params) {
         var month= yesterday.getMonth()+1;
         var day=yesterday.getDate();
         // Construct the InfluxDB line protocol string
-        var influxData = `humidity,location=office,year=${year},month=${month},day=${day} avg=${humidity_avg},max=${humidity_max},min=${humidity_min} ${tday}\n`;
-        influxData +=`temperature,location=office,year=${year},month=${month},day=${day} avg=${temperature_avg},max=${temperature_max},min=${temperature_min} ${tday}\n`;
-        influxData +=`gas_perc,location=office,year=${year},month=${month},day=${day} avg=${gas_perc_avg},max=${gas_perc_max},min=${gas_perc_min} ${tday}\n`;
+        var influxData = `humidity,datacenter_id=${location},year=${year},month=${month},day=${day} avg=${humidity_avg},max=${humidity_max},min=${humidity_min} ${tday}\n`;
+        influxData +=`temperature,datacenter_id=${location},year=${year},month=${month},day=${day} avg=${temperature_avg},max=${temperature_max},min=${temperature_min} ${tday}\n`;
+        influxData +=`gas_perc,datacenter_id=${location},year=${year},month=${month},day=${day} avg=${gas_perc_avg},max=${gas_perc_max},min=${gas_perc_min} ${tday}\n`;
+  
   
   
         const options = {

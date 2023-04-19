@@ -238,9 +238,9 @@ We will create a trigger that is fired at 3:00 every day and computes some aggre
 
 
 
-```
-wsk action update aggregatesAction aggregatesAction.js
-wsk trigger create aggregatesTrigger --feed /whisk.system/alarms/alarm --param cron "0 3 * * *" --param trigger_payload "{\"local_url\":\"http://influxdb-influxdb2:80\",\"local_token\":\"ZwWM2Gx17aMnJrBSIvbec1WK0Xga1oCJ\",\"local_org\":\"influxdata\",\"local_bucket\":\"measure\",\"central_url\":\"https://influxdb-centralized-gateway.liquidfaas.cloud\",\"central_token\":\"ZwWM2Gx17aMnJrBSIvbec1WK0Xga1oCJ\",\"central_org\":\"influxdata\",\"central_bucket\":\"aggregates\"}" -i
+```wsk action update aggregatesAction aggregatesAction.js --param local_url "http://influxdb-influxdb2:80" --param local_token "ZwWM2Gx17aMnJrBSIvbec1WK0Xga1oCJ" --param local_org "influxdata" --param local_bucket "measure" --param central_url "https://influxdb-centralized-gateway.liquidfaas.cloud" --param central_token "ZwWM2Gx17aMnJrBSIvbec1WK0Xga1oCJ" --param central_org "influxdata" --param central_bucket "aggregates" -i
+wsk trigger create aggregatesTrigger --feed /whisk.system/alarms/alarm --param cron "0 3 * * *" 
+
 ```
 
 Then, I must bind the trigger to the action:
