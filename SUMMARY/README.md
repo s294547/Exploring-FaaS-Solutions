@@ -59,7 +59,15 @@ Overall, leveraging OpenWhisk for edge device monitoring can be optimized for fo
 
 ![arch-aggregates](./archAggregates.jpg)
 
-Another functionality has been implementes: some daily aggregates are computed on the collected data for each local cluster and they are finally sent on a InfluxDB database on the centralized cluster. The operation of computing the aggregates is done with an action also in this case and the trigger related to it is fired with an Alarm Provider, which is natively provided when deployin OpenWhisk.
+Another functionality has been implemented: some aggregates are computed every helf an hour on the collected data for each local cluster and they are finally sent on a InfluxDB database on the centralized cluster. The operation of computing the aggregates is done with an action also in this case and the trigger related to it is fired with an Alarm Provider, which is natively provided when deployin OpenWhisk.
+
+Finally, I've also given the possibility to have a visual representation of the aggregates computed for each data center, deploying Grafana on the centralized instance. In the Grafana instance there will be just a Grafana dashboard, with multiple panels to show the different types of aggregate data for each data center. It possible to select the specific data center thanks to a template variable. 
+
+I could have also deployed a Grafana dashboard for each data center, but I preferred to deploy just a centralized dashboard: in this way, if there is the necessity to add some aggregate data, there is no need to modify all the local instances, but just the centralized one.
+
+While it's true that adding new dashboards to a centralized instance every time a new edge OpenWhisk instance is added can be a bit more work, it's still easier than updating multiple local deployments every time a new aggregate is added. Additionally, having a centralized instance allows you to have a more consistent and cohesive view of your data across all the edge OpenWhisk instances, making it easier to compare and analyze the data.
+
+Furthermore, using a centralized Grafana instance also has the advantage of making it easier to manage user access and permissions to the dashboards. Instead of having to manage access for each local deployment, you can manage access in one place, making it more efficient and secure.
 
 ## Workflow summary
 
@@ -81,14 +89,14 @@ During this steps I deployed everythin in different namespaces: *openwhisk*, *mo
 
 After testing this single-cluster solution, I managed to test the solution on a multiple cluster environment. To do that, I re-arranged the namespacing rules: insted of assigning a different namespace for each application or specific tool, i created a namespace for each *cluster*. In particular, in each namespace we can find the OpenWhisk deployment, InfluxDB, the MQTT broker and provider, while in the namespace related to the *centralized* cluster we can find the OpenWhisk deployment, InfluxDB and CouchDB. By organizing the namespaces in this way, I can call the different services like InfluxDB and OpenWhisk API Frontend in the same way, avoinding the use of customized paramters for each local data center and enforcing a standardization of the solution.
 
+The last step consisted in including Grafana Operator and Grafana in the centralized solution.
+
 I also tried to set connect my device to an Azure IoTHub and to fire an Azure Function whenever new data are published, just for the sake of curiosity.
 
 ## What still needs to be done
 
 Up to now, some things still need to be done:
 
- - I have to correct and add some things to the arduino project of the sensor
- - I have to develop an helm chart that automates the deployment of the entire solution (both for the local instances and the central instance)
  - I have to check everything again to discover some little errors
 
 

@@ -1,0 +1,53 @@
+apiVersion: integreatly.org/v1alpha1
+kind: Grafana
+metadata:
+  name: grafana
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+spec:
+  baseImage: {{ .Values.grafana.image }}
+  client:
+    preferService: true
+  deployment:
+    labels: {{ include "app.labels" . | nindent 6 }}
+      app.kubernetes.io/component: grafana
+{{- if .Values.plugins }}
+    envFrom:
+    - configMapRef:
+        name: grafana-plugins
+    - secretRef:
+        name: grafana-auth
+{{- end }}
+    env:
+{{ include "gomaxprocs" . | nindent 4 }}
+{{- if .Values.auth.oidc.enabled }}
+    - name: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+          name: keycloak-client-secret-grafana
+          key: CLIENT_ID
+    - name: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: keycloak-client-secret-grafana
+          key: CLIENT_SECRET
+{{- end }}
+  ingress:
+    enabled: False
+  config:
+{{ tpl (.Files.Get "configs/grafana.yaml") . | indent 4 }}
+  service:
+    name: "grafana"
+    labels: {{ include "app.labels" . | nindent 6 }}
+      app.kubernetes.io/component: grafana
+{{- if .Values.grafana.resources }}
+  resources:
+{{- .Values.grafana.resources | toYaml | nindent 4 }}
+{{- end }}
+  serviceAccount:
+    labels: {{ include "app.labels" . | nindent 6 }}
+      app.kubernetes.io/component: grafana
+  ingress:
+    enabled: false
+  dashboardLabelSelector:
+  - matchLabels: {}

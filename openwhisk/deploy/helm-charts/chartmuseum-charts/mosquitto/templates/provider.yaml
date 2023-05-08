@@ -1,0 +1,100 @@
+{{- if .Values.provider.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-provider
+  labels:
+    user-action-pod: "true"
+    name: mqtt-provider
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-service-provider
+  template:
+    metadata:
+      labels:
+        app: mqtt-service-provider
+        user-action-pod: "true"
+        name: mqtt-provider
+    spec:
+      containers:
+      - name: mqtt-service-provider
+        image: docker.io/giuliabianchi1408/mqtt_service_provider:latest
+        volumeMounts:
+        - name: volume-configmap
+          mountPath: /data/env-variables
+          subPath: env-variables
+        env:
+          - name: COUCHDB_USER 
+            valueFrom:
+              configMapKeyRef:
+                name: mqtt-provider-configmap
+                key: couchdbUsername
+          - name: COUCHDB_PASS 
+            valueFrom:
+              configMapKeyRef:
+                name: mqtt-provider-configmap
+                key: couchdbPassword
+          - name: COUCHDB_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: mqtt-provider-configmap
+                key: couchdbGateway
+          - name: COUCHDB_HOST_PORT 
+            valueFrom:
+              configMapKeyRef:
+                name: mqtt-provider-configmap
+                key: couchdbExtPort
+          - name: OPENWHISK_API_HOSTNAME
+            valueFrom:
+              configMapKeyRef:
+                name: mqtt-provider-configmap
+                key: apiHost
+      volumes:
+      - name: volume-configmap
+        configMap:
+          name: mqtt-provider-configmap
+
+            
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mqtt-provider-configmap
+  labels:
+    name: mqtt-provider
+    user-action-pod: "true"
+  namespace: {{ .Release.Namespace }}
+data:
+  couchdbUsername: "{{ .Values.provider.couchdbUsername }}"
+  couchdbPassword: "{{ .Values.provider.couchdbPassword }}"
+  couchdbGateway: "{{ .Values.provider.couchdbGateway }}"
+  couchdbExtPort: "{{ .Values.provider.couchdbExtPort }}"
+  apiHost: "{{ .Values.openwhisk.apiHost }}"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: mqtt-provider
+    user-action-pod: "true"
+  name: mqtt-provider
+  namespace: {{ .Release.Namespace }}
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: {{ .Values.provider.providerPort }}
+    protocol: TCP
+    targetPort: {{ .Values.provider.providerPort }}
+  selector:
+    app: mqtt-service-provider
+  sessionAffinity: None
+  type: ClusterIP
+{{- end }}

@@ -1,0 +1,8 @@
+---
+apiVersion: v2
+name: Traefik
+version: 1.0.0
+keywords:
+- "traefik"
+- "cluster-ingress"
+icon: https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Traefik.logo.png/742px-Traefik.logo.png

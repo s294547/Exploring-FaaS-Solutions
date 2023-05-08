@@ -1,0 +1,38 @@
+global:
+  domain_name: 'liquidfaas.cloud'
+  ipv4_address: '38.242.158.232'
+
+# ========== ========== ========== ========== ==========
+deploy:
+  traefik_image: traefik:latest
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+# ========== ========== ========== ========== ==========
+storage:
+  storage_size: '8Mi'
+  storage_class: 'local-path'
+
+# ========== ========== ========== ========== ==========
+traefik:
+  letsencrypt: true
+
+  entrypoints:
+    web:
+      port: 80
+    secure:
+      port: 443
+    mqtt:
+      port: 1883
+
+  
+
+# ========== ========== ========== ========== ==========
+metrics:
+  enabled: true

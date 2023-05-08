@@ -1,0 +1,17 @@
+{{- if .Values.iroute.enabled }}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: influxdb
+  labels:
+    app: influxdb
+spec:
+  routes:
+  - kind: Rule
+    match: Host(`{{ .Values.iroute.externalUrl }}`)
+    services:
+    - kind: Service
+      name: {{ .Release.Name }}-influxdb2
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.service.port }}
+{{- end }}

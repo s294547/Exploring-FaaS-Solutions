@@ -1,0 +1,17 @@
+{{- if .Values.iroute.enabled }}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: couchdb
+  labels:
+    app: couchdb
+spec:
+  routes:
+  - kind: Rule
+    match: Host(`{{ .Values.iroute.gateway }}`)
+    services:
+    - kind: Service
+      name: {{ .Release.Name }}-couchdb
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.service.externalPort}}
+{{- end }}

@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-operator
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: operator
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels: {{ include "app.labels" . | nindent 6 }}
+      app.kubernetes.io/component: operator
+  template:
+    metadata:
+      labels: {{ include "app.labels" . | nindent 8 }}
+        app.kubernetes.io/component: operator
+      annotations:
+        generation: "{{ .Release.Revision }}"
+    spec:
+      containers:
+      - name: grafana-operator
+        image: {{ .Values.operator.image }}
+        imagePullPolicy: Always
+        command:
+        - /manager
+        args:
+        - --leader-elect=false
+        - --health-probe-bind-address=:8081
+        - --metrics-bind-address=127.0.0.1:8080
+        - --zap-log-level=error
+        env:
+{{ include "gomaxprocs" . | nindent 8 }}
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: WATCH_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+{{- if .Values.operator.resources }}
+        resources:
+    {{- .Values.operator.resources | toYaml | nindent 10 }}
+{{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+      serviceAccountName: grafana-operator

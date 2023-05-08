@@ -1,0 +1,30 @@
+global:
+  domain_name: 'salaolimpo.cloud'
+
+grafana:
+  image: "grafana/grafana:main"
+  log_level: warn
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 384Mi
+
+plugins:
+- grafana-piechart-panel
+- petrslavotinek-carpetplot-panel
+- grafana-clock-panel
+- snuids-trafficlights-panel
+
+auth:
+  admin:
+    username: admin
+    password: Kerber1zed
+
+  oidc:
+    enabled: true
+    adminGroup: Administrators
+    issuer_url: https://sso.salaolimpo.cloud/auth/realms/openldap

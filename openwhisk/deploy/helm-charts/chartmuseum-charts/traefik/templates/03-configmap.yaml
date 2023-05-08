@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-config
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: traefik
+data:
+  traefik.toml: |
+{{ tpl (.Files.Get "configs/traefik.toml") . | indent 4 }}

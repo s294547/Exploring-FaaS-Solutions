@@ -1,0 +1,15 @@
+{{- if and (.Capabilities.APIVersions.Has "monitoring.coreos.com/v1/ServiceMonitor") (.Values.metrics.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: traefik
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: traefik
+spec:
+  selector:
+    matchLabels: {{ include "app.labels" . | nindent 6 }}
+      app.kubernetes.io/component: traefik
+  endpoints:
+  - port: internal
+    path: /metrics
+{{- end }}

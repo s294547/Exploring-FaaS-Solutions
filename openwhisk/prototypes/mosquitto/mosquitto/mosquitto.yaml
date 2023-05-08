@@ -1,0 +1,134 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: mosquitto-data
+  name: mosquitto-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: mosquitto-log
+  name: mosquitto-log
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-config
+  # Change if you want to deploy to somewhere other then default
+  labels:
+    app: mosquitto
+data:
+  mosquitto.conf: |
+    # Config file for mosquitto
+    listener 1883
+    allow_anonymous false
+    password_file mosquitto/config/passwords
+    persistence false
+    log_dest stdout
+  passwords: |
+    # Passwords file
+    test:$6$WgoRASWRnPePPq4Q$Q6g58x1Gf2mcoC/H1hOlm3Zml2dPyKGhqrmtU8fjjLr1/20Ddi+lm46zp4fqO+wgquXp8QHJLq/gW54h+KU7dw==
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mosquitto
+  # Change if you want to deploy to somewhere other then default
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosquitto
+  # Change if you want to deploy to somewhere other then default
+
+  labels:
+    app: mosquitto
+    name: mosquitto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+        name: mosquitto
+    spec:
+      serviceAccountName: mosquitto
+      containers:
+        - image: eclipse-mosquitto
+          imagePullPolicy: IfNotPresent
+          name: mosquitto
+          securityContext:
+            capabilities:
+                drop:
+                  - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          readinessProbe:
+            tcpSocket:
+              port: mqtt
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 1883
+              name: mqtt
+          volumeMounts:
+            - name: mosquitto-config
+              mountPath: /mosquitto/config
+            - mountPath: /mosquitto/log
+              name: mosquitto-log
+            - mountPath: /mosquitto/data
+              name: mosquitto-data
+      volumes:
+        - name: mosquitto-config
+          configMap:
+            name: mosquitto-config
+        - name: mosquitto-log
+          persistentVolumeClaim:
+            claimName: mosquitto-log
+        - name: mosquitto-data
+          persistentVolumeClaim:
+            claimName: mosquitto-data
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mosquitto
+spec:
+  selector:
+    app: mosquitto
+  ports:
+    - name: mqtt
+      port: 1883
+      targetPort: 1883
+      protocol: TCP
+  type: NodePort
+

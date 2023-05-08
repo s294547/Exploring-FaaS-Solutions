@@ -1,0 +1,28 @@
+{{- if .Capabilities.APIVersions.Has "keycloak.org/v1alpha1/KeycloakClient" }}
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakClient
+metadata:
+  name: grafana
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+spec:
+  realmSelector:
+    matchLabels:
+      app: keycloak
+  roles: []
+  client:
+    clientId: grafana
+    protocol: openid-connect
+    defaultRoles: []
+    redirectUris:
+    - "https://grafana.{{ .Values.global.domain_name }}/*"
+    webOrigins:
+    - "https://grafana.{{ .Values.global.domain_name }}/*"
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: true
+    rootUrl: "https://grafana.{{ .Values.global.domain_name }}"
+    adminUrl: "https://grafana.{{ .Values.global.domain_name }}"
+    defaultClientScopes:
+    - email
+    - profile
+{{- end }}

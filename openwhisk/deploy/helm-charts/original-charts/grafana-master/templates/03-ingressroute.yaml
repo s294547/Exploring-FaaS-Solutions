@@ -1,0 +1,17 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: grafana
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+spec:
+  entryPoints:
+  - https
+  routes:
+  - kind: Rule
+    match: Host(`grafana.{{ .Values.global.domain_name }}`)
+    services:
+    - kind: Service
+      name: grafana
+      namespace: {{ .Release.Namespace }}
+      port: grafana

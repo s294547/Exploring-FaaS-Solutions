@@ -1,0 +1,12 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-plugins
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+data:
+  GF_SERVER_ROOT_URL: https://grafana.{{ .Values.global.domain_name }}
+{{- if .Values.plugins }}
+  GF_INSTALL_PLUGINS: {{ join "," .Values.plugins }}
+{{- end }}

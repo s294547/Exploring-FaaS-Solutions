@@ -1,0 +1,9 @@
+---
+apiVersion: v2
+name: SalaOlimpo-Grafana-Operator
+version: 1.0.0
+keywords:
+- "grafana-operators"
+- "farm-keepers"
+- "observability"
+icon: https://artifacthub.io/image/7e652531-b40d-4cd4-a533-d7be7375a241@3x

@@ -1,0 +1,43 @@
+releaseName: openwhisk
+couchdb:
+  username: admin
+  password: admin
+  svcPort: 5984
+  gateway: couchdb-gateway
+  extPort: 443
+  #you can generate it with "curl https://www.uuidgenerator.net/api/version4 2>/dev/null | tr -d -"
+  uuid: decafbaddecafbaddecafbaddecafbad 
+mosquitto:
+  username: test
+  password: $6$WgoRASWRnPePPq4Q$Q6g58x1Gf2mcoC/H1hOlm3Zml2dPyKGhqrmtU8fjjLr1/20Ddi+lm46zp4fqO+wgquXp8QHJLq/gW54h+KU7dw==
+  plainPassword: test
+  providerPort: 3000
+  mosquittoPort: 1883
+influxdb: 
+  edge:
+    token: ZwWM2Gx17aMnJrBSIvbec1WK0Xga1oCJ
+    username: admin
+    password: adminopenwhiskinfluxdb
+    bucket: measure
+    org: influxdata
+    # remember to set the right url according to <releaseName>-influxdb2
+  central:
+    token: ZwWM2Gx17aMnJrBSIvbec1WK0Xga1oCJ
+    username: admin
+    password: adminopenwhiskinfluxdb
+    bucket: aggregates
+    org: influxdata
+    externalUrl: influxdb-centralized-gateway
+grafana:
+  username: admin
+  password: admin
+  extUsername: external
+  extPassword: external
+openwhisk:
+  guestAuth: 23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP
+#the domain name of the centralized instance
+domain_name: liquidfaas.cloud
+chartmuseum:
+  link: chart
+
+
