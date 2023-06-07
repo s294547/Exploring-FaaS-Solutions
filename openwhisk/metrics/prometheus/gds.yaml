@@ -1,0 +1,15 @@
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDataSource
+metadata:
+  name: prometheus
+  labels: 
+    app.kubernetes.io/component: prometheus
+spec:
+  name: prometheus
+  datasources:
+  - access: "proxy"
+    isDefault: true
+    name: "prometheus"
+    type: "prometheus"
+    url: "http://10.43.86.129:9090"
+    version: 1

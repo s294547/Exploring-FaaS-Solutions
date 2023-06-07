@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kube-state-metrics-exporter
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kube-state-metrics
+spec:
+  jobLabel: app.kubernetes.io/name
+  selector:
+    matchLabels: {{ include "app.labels" . | nindent 6 }}
+      app.kubernetes.io/component: kube-state-metrics
+  endpoints:
+  - port: http
+    honorLabels: true

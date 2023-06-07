@@ -1,0 +1,9 @@
+---
+apiVersion: v2
+name: SalaOlimpo-K3s-Exporter-Stack
+version: 1.0.0
+keywords:
+- "k3s-exporter-stack"
+- "farm-keepers"
+- "observability"
+# icon: https://grafana.com/static/assets/img/blog/loki.png

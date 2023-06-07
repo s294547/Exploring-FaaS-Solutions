@@ -1,0 +1,9 @@
+---
+apiVersion: v2
+name: SalaOlimpo-Prometheus-Operator
+version: 1.0.0
+keywords:
+- "prometheus-operator"
+- "farm-keepers"
+- "observability"
+# icon: https://grafana.com/static/assets/img/blog/loki.png

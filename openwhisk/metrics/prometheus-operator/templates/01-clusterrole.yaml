@@ -1,0 +1,34 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus-operator
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: prometheus-operator
+rules:
+- apiGroups: [monitoring.coreos.com]
+  resources: [alertmanagers,alertmanagerconfigs, prometheuses, thanosrulers, servicemonitors, podmonitors, probes, prometheusrules]
+  verbs: ['*']
+- apiGroups: [monitoring.coreos.com]
+  resources: [alertmanagers/status, prometheuses/status, alertmanagers/finalizers, prometheuses/finalizers, thanosrulers/finalizers]
+  verbs: ['*']
+- apiGroups: [apps]
+  resources: [statefulsets]
+  verbs: ['*']
+- apiGroups: ['']
+  resources: [configmaps, secrets]
+  verbs: ['*']
+- apiGroups: ['']
+  resources: [pods]
+  verbs: [list, delete]
+- apiGroups: ['']
+  resources: [services, services/finalizers, endpoints]
+  verbs: [get, create, update, delete]
+- apiGroups: ['']
+  resources: [nodes]
+  verbs: [list, watch]
+- apiGroups: ['']
+  resources: [namespaces]
+  verbs: [get, list, watch]
+- apiGroups: [networking.k8s.io]
+  resources: [ingresses]
+  verbs: [get, list, watch]

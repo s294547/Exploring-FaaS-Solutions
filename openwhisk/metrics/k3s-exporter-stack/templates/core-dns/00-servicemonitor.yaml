@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: core-dns
+  namespace: kube-system
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: core-dns
+spec:
+  jobLabel: jobLabel
+  selector:
+    matchLabels:
+      k8s-app: kube-dns
+  endpoints:
+  - port: metrics
+    bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token

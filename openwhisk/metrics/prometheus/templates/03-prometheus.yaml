@@ -1,0 +1,58 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: prometheus
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: prometheus
+spec:
+  podMetadata:
+    labels: {{ include "app.labels" . | nindent 6 }}
+      app.kubernetes.io/component: prometheus
+  alerting:
+    alertmanagers:
+      - namespace: {{ .Release.Namespace }}
+        name: alertmanager
+        port: http-web
+        pathPrefix: "/"
+        apiVersion: v2
+  image: "quay.io/prometheus/prometheus:v2.42.0"
+  version: v2.42.0
+  externalUrl: http://prometheus.{{ .Release.Namespace }}:9090
+  storage:
+    volumeClaimTemplate:
+      metadata: 
+        name: prometheus-data
+        labels: {{ include "app.labels" . | nindent 10 }}
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 20Gi
+  paused: false
+  replicas: 1
+  shards: 1
+  logLevel:  info
+  logFormat:  logfmt
+  listenLocal: false
+  enableAdminAPI: false
+  retention: "10d"
+  walCompression: true
+  routePrefix: "/"
+  serviceAccountName: prometheus
+  serviceMonitorSelector: {}
+  serviceMonitorNamespaceSelector: {}
+  podMonitorSelector: {}
+  podMonitorNamespaceSelector: {}
+  probeSelector: {}
+  probeNamespaceSelector: {}
+  # securityContext:
+  #   fsGroup: 2000
+  #   runAsGroup: 2000
+  #   runAsNonRoot: true
+  #   runAsUser: 1000
+  ruleSelector: {}
+  ruleNamespaceSelector: {}
+  portName: http-web
+  hostNetwork: false

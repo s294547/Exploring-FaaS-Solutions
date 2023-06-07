@@ -1,0 +1,17 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: prometheus
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: prometheus
+spec:
+  entryPoints:
+  - https
+  routes:
+  - kind: Rule
+    match: Host(`prometheus.{{ .Values.global.domain_name }}`)
+    services:
+    - kind: Service
+      name: prometheus
+      namespace: {{ .Release.Namespace }}
+      port: http-web

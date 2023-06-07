@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: node-exporter
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: node-exporter
+spec:
+  jobLabel: jobLabel
+  selector:
+    matchLabels: {{ include "app.labels" . | nindent 6 }}
+      app.kubernetes.io/component: node-exporter
+  endpoints:
+    - port: http-metrics
+      scheme: http

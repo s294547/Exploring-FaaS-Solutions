@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-state-metrics-exporter
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kube-state-metrics
+spec:
+  type: "ClusterIP"
+  ports:
+  - name: "http"
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+  selector: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kube-state-metrics

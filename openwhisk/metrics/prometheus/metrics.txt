@@ -1,0 +1,536 @@
+# HELP jvm_memory_allocation_bytes_total Tracks the number amount of bytes allocated
+# TYPE jvm_memory_allocation_bytes_total counter
+jvm_memory_allocation_bytes_total{component="jvm"} 0.0
+# TYPE counter_database_getDocument_start_total counter
+counter_database_getDocument_start_total 0.0
+# TYPE counter_controller_startup_counter_total counter
+counter_controller_startup_counter_total{controller_id="0"} 0.0
+# TYPE counter_http_get_counter_total counter
+counter_http_get_counter_total{statusCode="200"} 114123.0
+counter_http_get_counter_total{statusCode="404"} 1.0
+# TYPE counter_loadbalancer_completionAck_counter_total counter
+counter_loadbalancer_completionAck_counter_total{controller_id="0",type="healthcheck"} 2.0
+# TYPE counter_database_saveDocument_start_total counter
+counter_database_saveDocument_start_total 0.0
+# TYPE counter_loadbalancer_invokerState_counter_total counter
+counter_loadbalancer_invokerState_counter_total{state="unhealthy"} 1.0
+# TYPE counter_controller_kafka_start_total counter
+counter_controller_kafka_start_total 2.0
+# TYPE counter_database_cacheMiss_counter_total counter
+counter_database_cacheMiss_counter_total 0.0
+# HELP kamon_trace_sampler_decisions_total Counts how many sampling decisions have been taking by Kamon's current sampler.
+# TYPE kamon_trace_sampler_decisions_total counter
+kamon_trace_sampler_decisions_total{decision="sample",sampler="adaptive"} 0.0
+kamon_trace_sampler_decisions_total{decision="do-not-sample",sampler="constant"} 0.0
+kamon_trace_sampler_decisions_total{decision="do-not-sample",sampler="adaptive"} 0.0
+kamon_trace_sampler_decisions_total{decision="sample",sampler="constant"} 0.0
+# TYPE counter_loadbalancer_activations_counter_total counter
+counter_loadbalancer_activations_counter_total 2.0
+# HELP jvm_memory_committed_bytes Tracks the committed space in a memory region
+# TYPE jvm_memory_committed_bytes gauge
+jvm_memory_committed_bytes{region="heap",component="jvm"} 72220672.0
+jvm_memory_committed_bytes{region="non-heap",component="jvm"} 396028756.0
+# TYPE gauge_loadbalancer_totalCapacityManaged_counter gauge
+gauge_loadbalancer_totalCapacityManaged_counter 2048.0
+# HELP jvm_threads_peak Tracks the peak live thread count since the JVM started
+# TYPE jvm_threads_peak gauge
+jvm_threads_peak 78.0
+# HELP process_ulimit_file_descriptors_max Tracks the max number of file descriptors that can be used by the process
+# TYPE process_ulimit_file_descriptors_max gauge
+process_ulimit_file_descriptors_max{component="process"} 1048576.0
+# TYPE gauge_loadbalancer_totalUnresponsiveInvokerBlackBox_counter gauge
+gauge_loadbalancer_totalUnresponsiveInvokerBlackBox_counter 0.0
+# TYPE gauge_loadbalancer_totalUnresponsiveInvokerManaged_counter gauge
+gauge_loadbalancer_totalUnresponsiveInvokerManaged_counter 0.0
+# HELP jvm_memory_buffer_pool_capacity_bytes Estimate of the total capacity of this pool in bytes
+# TYPE jvm_memory_buffer_pool_capacity_bytes gauge
+jvm_memory_buffer_pool_capacity_bytes{component="jvm",pool="direct"} 427009.0
+jvm_memory_buffer_pool_capacity_bytes{component="jvm",pool="mapped"} 0.0
+# HELP jvm_memory_max_bytes Tracks the max space in a memory region
+# TYPE jvm_memory_max_bytes gauge
+jvm_memory_max_bytes{region="heap",component="jvm"} 1073741824.0
+jvm_memory_max_bytes{region="non-heap",component="jvm"} 0.0
+# TYPE gauge_loadbalancer_memoryManagedInflight_counter gauge
+gauge_loadbalancer_memoryManagedInflight_counter{controller_id="0"} 0.0
+# HELP jvm_memory_buffer_pool_count Estimated number of buffers in the pool
+# TYPE jvm_memory_buffer_pool_count gauge
+jvm_memory_buffer_pool_count{component="jvm",pool="direct"} 71.0
+jvm_memory_buffer_pool_count{component="jvm",pool="mapped"} 0.0
+# TYPE gauge_loadbalancer_totalHealthyInvokerManaged_counter gauge
+gauge_loadbalancer_totalHealthyInvokerManaged_counter 1.0
+# TYPE gauge_loadbalancer_memoryInflight_counter gauge
+gauge_loadbalancer_memoryInflight_counter{controller_id="0"} 0.0
+# TYPE gauge_loadbalancer_totalOfflineInvokerManaged_counter gauge
+gauge_loadbalancer_totalOfflineInvokerManaged_counter 0.0
+# HELP jvm_memory_pool_max_bytes Tracks the max space in a memory pool
+# TYPE jvm_memory_pool_max_bytes gauge
+jvm_memory_pool_max_bytes{component="jvm",pool="tenured-loa"} 10717184.0
+jvm_memory_pool_max_bytes{component="jvm",pool="jit-code-cache"} 268435456.0
+jvm_memory_pool_max_bytes{component="jvm",pool="nursery-allocate"} 241014784.0
+jvm_memory_pool_max_bytes{component="jvm",pool="tenured-soa"} 1060927488.0
+jvm_memory_pool_max_bytes{component="jvm",pool="jit-data-cache"} 402653184.0
+jvm_memory_pool_max_bytes{component="jvm",pool="class-storage"} 0.0
+jvm_memory_pool_max_bytes{component="jvm",pool="nursery-survivor"} 27420672.0
+jvm_memory_pool_max_bytes{component="jvm",pool="miscellaneous-non-heap-storage"} 0.0
+# TYPE gauge_loadbalancer_totalCapacityBlackBox_counter gauge
+gauge_loadbalancer_totalCapacityBlackBox_counter 2048.0
+# HELP jvm_threads_total Tracks the current number of live threads on the JVM
+# TYPE jvm_threads_total gauge
+jvm_threads_total 74.0
+# HELP jvm_memory_buffer_pool_used_bytes Estimate of memory used by the JVM for this buffer pool in bytes
+# TYPE jvm_memory_buffer_pool_used_bytes gauge
+jvm_memory_buffer_pool_used_bytes{component="jvm",pool="direct"} 427009.0
+jvm_memory_buffer_pool_used_bytes{component="jvm",pool="mapped"} 0.0
+# HELP process_ulimit_file_descriptors_used Tracks the number of file descriptors used by the process
+# TYPE process_ulimit_file_descriptors_used gauge
+process_ulimit_file_descriptors_used{component="process"} 0.0
+# TYPE gauge_loadbalancer_totalUnhealthyInvokerBlackBox_counter gauge
+gauge_loadbalancer_totalUnhealthyInvokerBlackBox_counter 0.0
+# TYPE gauge_loadbalancer_totalOfflineInvokerBlackBox_counter gauge
+gauge_loadbalancer_totalOfflineInvokerBlackBox_counter 0.0
+# HELP jvm_class_loading_currently_loaded Total number od classes currently loaded
+# TYPE jvm_class_loading_currently_loaded gauge
+jvm_class_loading_currently_loaded{component="jvm"} 12395.0
+# TYPE gauge_loadbalancer_totalHealthyInvokerBlackBox_counter gauge
+gauge_loadbalancer_totalHealthyInvokerBlackBox_counter 1.0
+# HELP jvm_class_loading_unloaded Total number od classes unloaded
+# TYPE jvm_class_loading_unloaded gauge
+jvm_class_loading_unloaded{component="jvm"} 34.0
+# HELP jvm_threads_daemon Tracks the current number of daemon threads on the JVM
+# TYPE jvm_threads_daemon gauge
+jvm_threads_daemon 38.0
+# TYPE gauge_loadbalancer_totalUnhealthyInvokerManaged_counter gauge
+gauge_loadbalancer_totalUnhealthyInvokerManaged_counter 0.0
+# TYPE gauge_loadbalancer_activationsInflight_counter gauge
+gauge_loadbalancer_activationsInflight_counter{controller_id="0"} 0.0
+# TYPE gauge_loadbalancer_memoryBlackboxInflight_counter gauge
+gauge_loadbalancer_memoryBlackboxInflight_counter{controller_id="0"} 0.0
+# HELP jvm_memory_pool_committed_bytes Tracks the committed space in a memory pool
+# TYPE jvm_memory_pool_committed_bytes gauge
+jvm_memory_pool_committed_bytes{component="jvm",pool="tenured-loa"} 479232.0
+jvm_memory_pool_committed_bytes{component="jvm",pool="jit-code-cache"} 268435456.0
+jvm_memory_pool_committed_bytes{component="jvm",pool="nursery-allocate"} 21889024.0
+jvm_memory_pool_committed_bytes{component="jvm",pool="tenured-soa"} 47362048.0
+jvm_memory_pool_committed_bytes{component="jvm",pool="jit-data-cache"} 10485760.0
+jvm_memory_pool_committed_bytes{component="jvm",pool="class-storage"} 80624472.0
+jvm_memory_pool_committed_bytes{component="jvm",pool="nursery-survivor"} 2490368.0
+jvm_memory_pool_committed_bytes{component="jvm",pool="miscellaneous-non-heap-storage"} 36483068.0
+# HELP jvm_class_loading_loaded Total number od classes loaded
+# TYPE jvm_class_loading_loaded gauge
+jvm_class_loading_loaded{component="jvm"} 12429.0
+# TYPE gauge_kafka_topic_counter gauge
+gauge_kafka_topic_counter{topic="completed0"} 0.0
+gauge_kafka_topic_counter{topic="health"} 1.0
+# HELP process_cpu_usage Samples the Process CPU usage
+# TYPE process_cpu_usage histogram
+process_cpu_usage_bucket{le="10.0",component="process",mode="system"} 342772.0
+process_cpu_usage_bucket{le="30.0",component="process",mode="system"} 342772.0
+process_cpu_usage_bucket{le="100.0",component="process",mode="system"} 342772.0
+process_cpu_usage_bucket{le="300.0",component="process",mode="system"} 342772.0
+process_cpu_usage_bucket{le="1000.0",component="process",mode="system"} 342772.0
+process_cpu_usage_bucket{le="3000.0",component="process",mode="system"} 342772.0
+process_cpu_usage_bucket{le="10000.0",component="process",mode="system"} 342772.0
+process_cpu_usage_bucket{le="30000.0",component="process",mode="system"} 342772.0
+process_cpu_usage_bucket{le="100000.0",component="process",mode="system"} 342772.0
+process_cpu_usage_bucket{le="+Inf",component="process",mode="system"} 342772.0
+process_cpu_usage_count{component="process",mode="system"} 342772.0
+process_cpu_usage_sum{component="process",mode="system"} 6844.0
+process_cpu_usage_bucket{le="10.0",component="process",mode="combined"} 342660.0
+process_cpu_usage_bucket{le="30.0",component="process",mode="combined"} 342767.0
+process_cpu_usage_bucket{le="100.0",component="process",mode="combined"} 342772.0
+process_cpu_usage_bucket{le="300.0",component="process",mode="combined"} 342772.0
+process_cpu_usage_bucket{le="1000.0",component="process",mode="combined"} 342772.0
+process_cpu_usage_bucket{le="3000.0",component="process",mode="combined"} 342772.0
+process_cpu_usage_bucket{le="10000.0",component="process",mode="combined"} 342772.0
+process_cpu_usage_bucket{le="30000.0",component="process",mode="combined"} 342772.0
+process_cpu_usage_bucket{le="100000.0",component="process",mode="combined"} 342772.0
+process_cpu_usage_bucket{le="+Inf",component="process",mode="combined"} 342772.0
+process_cpu_usage_count{component="process",mode="combined"} 342772.0
+process_cpu_usage_sum{component="process",mode="combined"} 153925.0
+process_cpu_usage_bucket{le="10.0",component="process",mode="user"} 342690.0
+process_cpu_usage_bucket{le="30.0",component="process",mode="user"} 342768.0
+process_cpu_usage_bucket{le="100.0",component="process",mode="user"} 342772.0
+process_cpu_usage_bucket{le="300.0",component="process",mode="user"} 342772.0
+process_cpu_usage_bucket{le="1000.0",component="process",mode="user"} 342772.0
+process_cpu_usage_bucket{le="3000.0",component="process",mode="user"} 342772.0
+process_cpu_usage_bucket{le="10000.0",component="process",mode="user"} 342772.0
+process_cpu_usage_bucket{le="30000.0",component="process",mode="user"} 342772.0
+process_cpu_usage_bucket{le="100000.0",component="process",mode="user"} 342772.0
+process_cpu_usage_bucket{le="+Inf",component="process",mode="user"} 342772.0
+process_cpu_usage_count{component="process",mode="user"} 342772.0
+process_cpu_usage_sum{component="process",mode="user"} 103028.0
+# HELP jvm_memory_used_bytes Samples the used space in a memory region
+# TYPE jvm_memory_used_bytes histogram
+jvm_memory_used_bytes_bucket{region="heap",le="512.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="heap",le="1024.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="heap",le="2048.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="heap",le="4096.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="heap",le="16384.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="heap",le="65536.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="heap",le="524288.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="heap",le="1048576.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="heap",le="+Inf",component="jvm"} 34277.0
+jvm_memory_used_bytes_count{region="heap",component="jvm"} 34277.0
+jvm_memory_used_bytes_sum{region="heap",component="jvm"} 1666950365184.0
+jvm_memory_used_bytes_bucket{region="non-heap",le="512.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="non-heap",le="1024.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="non-heap",le="2048.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="non-heap",le="4096.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="non-heap",le="16384.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="non-heap",le="65536.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="non-heap",le="524288.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="non-heap",le="1048576.0",component="jvm"} 0.0
+jvm_memory_used_bytes_bucket{region="non-heap",le="+Inf",component="jvm"} 34277.0
+jvm_memory_used_bytes_count{region="non-heap",component="jvm"} 34277.0
+jvm_memory_used_bytes_sum{region="non-heap",component="jvm"} 4167891943424.0
+# HELP jvm_gc_seconds Tracks the distribution of GC events duration
+# TYPE jvm_gc_seconds histogram
+jvm_gc_seconds_bucket{collector="global",le="0.005",component="jvm",generation="unknown"} 0.0
+jvm_gc_seconds_bucket{collector="global",le="0.01",component="jvm",generation="unknown"} 0.0
+jvm_gc_seconds_bucket{collector="global",le="0.025",component="jvm",generation="unknown"} 0.0
+jvm_gc_seconds_bucket{collector="global",le="0.05",component="jvm",generation="unknown"} 0.0
+jvm_gc_seconds_bucket{collector="global",le="0.075",component="jvm",generation="unknown"} 0.0
+jvm_gc_seconds_bucket{collector="global",le="0.1",component="jvm",generation="unknown"} 1.0
+jvm_gc_seconds_bucket{collector="global",le="0.25",component="jvm",generation="unknown"} 2.0
+jvm_gc_seconds_bucket{collector="global",le="0.5",component="jvm",generation="unknown"} 5.0
+jvm_gc_seconds_bucket{collector="global",le="0.75",component="jvm",generation="unknown"} 5.0
+jvm_gc_seconds_bucket{collector="global",le="1.0",component="jvm",generation="unknown"} 5.0
+jvm_gc_seconds_bucket{collector="global",le="2.5",component="jvm",generation="unknown"} 5.0
+jvm_gc_seconds_bucket{collector="global",le="5.0",component="jvm",generation="unknown"} 5.0
+jvm_gc_seconds_bucket{collector="global",le="7.5",component="jvm",generation="unknown"} 5.0
+jvm_gc_seconds_bucket{collector="global",le="10.0",component="jvm",generation="unknown"} 5.0
+jvm_gc_seconds_bucket{collector="global",le="+Inf",component="jvm",generation="unknown"} 5.0
+jvm_gc_seconds_count{component="jvm",collector="global",generation="unknown"} 5.0
+jvm_gc_seconds_sum{component="jvm",collector="global",generation="unknown"} 1.028
+jvm_gc_seconds_bucket{collector="scavenge",le="0.005",component="jvm",generation="unknown"} 51739.0
+jvm_gc_seconds_bucket{collector="scavenge",le="0.01",component="jvm",generation="unknown"} 70887.0
+jvm_gc_seconds_bucket{collector="scavenge",le="0.025",component="jvm",generation="unknown"} 79828.0
+jvm_gc_seconds_bucket{collector="scavenge",le="0.05",component="jvm",generation="unknown"} 80474.0
+jvm_gc_seconds_bucket{collector="scavenge",le="0.075",component="jvm",generation="unknown"} 81921.0
+jvm_gc_seconds_bucket{collector="scavenge",le="0.1",component="jvm",generation="unknown"} 89475.0
+jvm_gc_seconds_bucket{collector="scavenge",le="0.25",component="jvm",generation="unknown"} 92854.0
+jvm_gc_seconds_bucket{collector="scavenge",le="0.5",component="jvm",generation="unknown"} 93382.0
+jvm_gc_seconds_bucket{collector="scavenge",le="0.75",component="jvm",generation="unknown"} 93455.0
+jvm_gc_seconds_bucket{collector="scavenge",le="1.0",component="jvm",generation="unknown"} 93464.0
+jvm_gc_seconds_bucket{collector="scavenge",le="2.5",component="jvm",generation="unknown"} 93472.0
+jvm_gc_seconds_bucket{collector="scavenge",le="5.0",component="jvm",generation="unknown"} 93472.0
+jvm_gc_seconds_bucket{collector="scavenge",le="7.5",component="jvm",generation="unknown"} 93472.0
+jvm_gc_seconds_bucket{collector="scavenge",le="10.0",component="jvm",generation="unknown"} 93472.0
+jvm_gc_seconds_bucket{collector="scavenge",le="+Inf",component="jvm",generation="unknown"} 93472.0
+jvm_gc_seconds_count{component="jvm",collector="scavenge",generation="unknown"} 93472.0
+jvm_gc_seconds_sum{component="jvm",collector="scavenge",generation="unknown"} 1958.133
+# HELP jvm_gc_promotion_bytes Tracks the distribution of promoted bytes to the old generation regions after a GC
+# TYPE jvm_gc_promotion_bytes histogram
+# TYPE histogram_http_get_counter_seconds histogram
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="0.005"} 110907.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="0.01"} 112070.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="0.025"} 112761.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="0.05"} 112855.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="0.075"} 113207.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="0.1"} 113780.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="0.25"} 114051.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="0.5"} 114111.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="0.75"} 114120.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="1.0"} 114122.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="2.5"} 114123.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="5.0"} 114123.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="7.5"} 114123.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="10.0"} 114123.0
+histogram_http_get_counter_seconds_bucket{statusCode="200",le="+Inf"} 114123.0
+histogram_http_get_counter_seconds_count{statusCode="200"} 114123.0
+histogram_http_get_counter_seconds_sum{statusCode="200"} 224.439
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="0.005"} 0.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="0.01"} 0.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="0.025"} 0.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="0.05"} 0.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="0.075"} 0.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="0.1"} 0.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="0.25"} 0.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="0.5"} 0.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="0.75"} 1.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="1.0"} 1.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="2.5"} 1.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="5.0"} 1.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="7.5"} 1.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="10.0"} 1.0
+histogram_http_get_counter_seconds_bucket{statusCode="404",le="+Inf"} 1.0
+histogram_http_get_counter_seconds_count{statusCode="404"} 1.0
+histogram_http_get_counter_seconds_sum{statusCode="404"} 0.592
+# TYPE histogram_kafka_topic_start_seconds histogram
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="0.005"} 0.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="0.01"} 0.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="0.025"} 0.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="0.05"} 0.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="0.075"} 0.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="0.1"} 0.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="0.25"} 1.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="0.5"} 2.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="0.75"} 2.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="1.0"} 2.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="2.5"} 2.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="5.0"} 2.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="7.5"} 2.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="10.0"} 2.0
+histogram_kafka_topic_start_seconds_bucket{topic="completed0",le="+Inf"} 2.0
+histogram_kafka_topic_start_seconds_count{topic="completed0"} 2.0
+histogram_kafka_topic_start_seconds_sum{topic="completed0"} 0.407
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="0.005"} 234022.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="0.01"} 270028.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="0.025"} 287653.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="0.05"} 288888.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="0.075"} 294147.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="0.1"} 312855.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="0.25"} 324358.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="0.5"} 327008.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="0.75"} 327625.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="1.0"} 327774.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="2.5"} 327919.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="5.0"} 327930.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="7.5"} 327930.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="10.0"} 327930.0
+histogram_kafka_topic_start_seconds_bucket{topic="health",le="+Inf"} 327930.0
+histogram_kafka_topic_start_seconds_count{topic="health"} 327930.0
+histogram_kafka_topic_start_seconds_sum{topic="health"} 6444.721
+# HELP jvm_memory_pool_used_bytes Samples the used space in a memory pool
+# TYPE jvm_memory_pool_used_bytes histogram
+jvm_memory_pool_used_bytes_bucket{le="512.0",component="jvm",pool="tenured-loa"} 34277.0
+jvm_memory_pool_used_bytes_bucket{le="1024.0",component="jvm",pool="tenured-loa"} 34277.0
+jvm_memory_pool_used_bytes_bucket{le="2048.0",component="jvm",pool="tenured-loa"} 34277.0
+jvm_memory_pool_used_bytes_bucket{le="4096.0",component="jvm",pool="tenured-loa"} 34277.0
+jvm_memory_pool_used_bytes_bucket{le="16384.0",component="jvm",pool="tenured-loa"} 34277.0
+jvm_memory_pool_used_bytes_bucket{le="65536.0",component="jvm",pool="tenured-loa"} 34277.0
+jvm_memory_pool_used_bytes_bucket{le="524288.0",component="jvm",pool="tenured-loa"} 34277.0
+jvm_memory_pool_used_bytes_bucket{le="1048576.0",component="jvm",pool="tenured-loa"} 34277.0
+jvm_memory_pool_used_bytes_bucket{le="+Inf",component="jvm",pool="tenured-loa"} 34277.0
+jvm_memory_pool_used_bytes_count{component="jvm",pool="tenured-loa"} 34277.0
+jvm_memory_pool_used_bytes_sum{component="jvm",pool="tenured-loa"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="512.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="1024.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="2048.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="4096.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="16384.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="65536.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="524288.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="1048576.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="+Inf",component="jvm",pool="jit-code-cache"} 34277.0
+jvm_memory_pool_used_bytes_count{component="jvm",pool="jit-code-cache"} 34277.0
+jvm_memory_pool_used_bytes_sum{component="jvm",pool="jit-code-cache"} 476983066624.0
+jvm_memory_pool_used_bytes_bucket{le="512.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="1024.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="2048.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="4096.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="16384.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="65536.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="524288.0",component="jvm",pool="nursery-allocate"} 483.0
+jvm_memory_pool_used_bytes_bucket{le="1048576.0",component="jvm",pool="nursery-allocate"} 1764.0
+jvm_memory_pool_used_bytes_bucket{le="+Inf",component="jvm",pool="nursery-allocate"} 34277.0
+jvm_memory_pool_used_bytes_count{component="jvm",pool="nursery-allocate"} 34277.0
+jvm_memory_pool_used_bytes_sum{component="jvm",pool="nursery-allocate"} 273803235328.0
+jvm_memory_pool_used_bytes_bucket{le="512.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="1024.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="2048.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="4096.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="16384.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="65536.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="524288.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="1048576.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="+Inf",component="jvm",pool="tenured-soa"} 34277.0
+jvm_memory_pool_used_bytes_count{component="jvm",pool="tenured-soa"} 34277.0
+jvm_memory_pool_used_bytes_sum{component="jvm",pool="tenured-soa"} 1332859371520.0
+jvm_memory_pool_used_bytes_bucket{le="512.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="1024.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="2048.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="4096.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="16384.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="65536.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="524288.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="1048576.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="+Inf",component="jvm",pool="jit-data-cache"} 34277.0
+jvm_memory_pool_used_bytes_count{component="jvm",pool="jit-data-cache"} 34277.0
+jvm_memory_pool_used_bytes_sum{component="jvm",pool="jit-data-cache"} 353342849024.0
+jvm_memory_pool_used_bytes_bucket{le="512.0",component="jvm",pool="class-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="1024.0",component="jvm",pool="class-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="2048.0",component="jvm",pool="class-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="4096.0",component="jvm",pool="class-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="16384.0",component="jvm",pool="class-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="65536.0",component="jvm",pool="class-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="524288.0",component="jvm",pool="class-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="1048576.0",component="jvm",pool="class-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="+Inf",component="jvm",pool="class-storage"} 34277.0
+jvm_memory_pool_used_bytes_count{component="jvm",pool="class-storage"} 34277.0
+jvm_memory_pool_used_bytes_sum{component="jvm",pool="class-storage"} 2420051542016.0
+jvm_memory_pool_used_bytes_bucket{le="512.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="1024.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="2048.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="4096.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="16384.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="65536.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="524288.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="1048576.0",component="jvm",pool="nursery-survivor"} 4383.0
+jvm_memory_pool_used_bytes_bucket{le="+Inf",component="jvm",pool="nursery-survivor"} 34277.0
+jvm_memory_pool_used_bytes_count{component="jvm",pool="nursery-survivor"} 34277.0
+jvm_memory_pool_used_bytes_sum{component="jvm",pool="nursery-survivor"} 59760377856.0
+jvm_memory_pool_used_bytes_bucket{le="512.0",component="jvm",pool="miscellaneous-non-heap-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="1024.0",component="jvm",pool="miscellaneous-non-heap-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="2048.0",component="jvm",pool="miscellaneous-non-heap-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="4096.0",component="jvm",pool="miscellaneous-non-heap-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="16384.0",component="jvm",pool="miscellaneous-non-heap-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="65536.0",component="jvm",pool="miscellaneous-non-heap-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="524288.0",component="jvm",pool="miscellaneous-non-heap-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="1048576.0",component="jvm",pool="miscellaneous-non-heap-storage"} 0.0
+jvm_memory_pool_used_bytes_bucket{le="+Inf",component="jvm",pool="miscellaneous-non-heap-storage"} 34277.0
+jvm_memory_pool_used_bytes_count{component="jvm",pool="miscellaneous-non-heap-storage"} 34277.0
+jvm_memory_pool_used_bytes_sum{component="jvm",pool="miscellaneous-non-heap-storage"} 922686455808.0
+# TYPE histogram_controller_kafka_finish_seconds histogram
+histogram_controller_kafka_finish_seconds_bucket{le="0.005"} 0.0
+histogram_controller_kafka_finish_seconds_bucket{le="0.01"} 0.0
+histogram_controller_kafka_finish_seconds_bucket{le="0.025"} 1.0
+histogram_controller_kafka_finish_seconds_bucket{le="0.05"} 1.0
+histogram_controller_kafka_finish_seconds_bucket{le="0.075"} 1.0
+histogram_controller_kafka_finish_seconds_bucket{le="0.1"} 1.0
+histogram_controller_kafka_finish_seconds_bucket{le="0.25"} 1.0
+histogram_controller_kafka_finish_seconds_bucket{le="0.5"} 2.0
+histogram_controller_kafka_finish_seconds_bucket{le="0.75"} 2.0
+histogram_controller_kafka_finish_seconds_bucket{le="1.0"} 2.0
+histogram_controller_kafka_finish_seconds_bucket{le="2.5"} 2.0
+histogram_controller_kafka_finish_seconds_bucket{le="5.0"} 2.0
+histogram_controller_kafka_finish_seconds_bucket{le="7.5"} 2.0
+histogram_controller_kafka_finish_seconds_bucket{le="10.0"} 2.0
+histogram_controller_kafka_finish_seconds_bucket{le="+Inf"} 2.0
+histogram_controller_kafka_finish_seconds_count 2.0
+histogram_controller_kafka_finish_seconds_sum 0.302
+# TYPE histogram_database_saveDocument_finish_seconds histogram
+# HELP jvm_memory_free_bytes Samples the free space in a memory region
+# TYPE jvm_memory_free_bytes histogram
+jvm_memory_free_bytes_bucket{region="heap",le="512.0",component="jvm"} 0.0
+jvm_memory_free_bytes_bucket{region="heap",le="1024.0",component="jvm"} 0.0
+jvm_memory_free_bytes_bucket{region="heap",le="2048.0",component="jvm"} 0.0
+jvm_memory_free_bytes_bucket{region="heap",le="4096.0",component="jvm"} 0.0
+jvm_memory_free_bytes_bucket{region="heap",le="16384.0",component="jvm"} 0.0
+jvm_memory_free_bytes_bucket{region="heap",le="65536.0",component="jvm"} 0.0
+jvm_memory_free_bytes_bucket{region="heap",le="524288.0",component="jvm"} 0.0
+jvm_memory_free_bytes_bucket{region="heap",le="1048576.0",component="jvm"} 0.0
+jvm_memory_free_bytes_bucket{region="heap",le="+Inf",component="jvm"} 34277.0
+jvm_memory_free_bytes_count{region="heap",component="jvm"} 34277.0
+jvm_memory_free_bytes_sum{region="heap",component="jvm"} 35061223129088.0
+jvm_memory_free_bytes_bucket{region="non-heap",le="512.0",component="jvm"} 34277.0
+jvm_memory_free_bytes_bucket{region="non-heap",le="1024.0",component="jvm"} 34277.0
+jvm_memory_free_bytes_bucket{region="non-heap",le="2048.0",component="jvm"} 34277.0
+jvm_memory_free_bytes_bucket{region="non-heap",le="4096.0",component="jvm"} 34277.0
+jvm_memory_free_bytes_bucket{region="non-heap",le="16384.0",component="jvm"} 34277.0
+jvm_memory_free_bytes_bucket{region="non-heap",le="65536.0",component="jvm"} 34277.0
+jvm_memory_free_bytes_bucket{region="non-heap",le="524288.0",component="jvm"} 34277.0
+jvm_memory_free_bytes_bucket{region="non-heap",le="1048576.0",component="jvm"} 34277.0
+jvm_memory_free_bytes_bucket{region="non-heap",le="+Inf",component="jvm"} 34277.0
+jvm_memory_free_bytes_count{region="non-heap",component="jvm"} 34277.0
+jvm_memory_free_bytes_sum{region="non-heap",component="jvm"} 0.0
+# HELP jvm_memory_pool_free_bytes Samples the free space in a memory pool
+# TYPE jvm_memory_pool_free_bytes histogram
+jvm_memory_pool_free_bytes_bucket{le="512.0",component="jvm",pool="tenured-loa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="1024.0",component="jvm",pool="tenured-loa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="2048.0",component="jvm",pool="tenured-loa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="4096.0",component="jvm",pool="tenured-loa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="16384.0",component="jvm",pool="tenured-loa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="65536.0",component="jvm",pool="tenured-loa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="524288.0",component="jvm",pool="tenured-loa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="1048576.0",component="jvm",pool="tenured-loa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="+Inf",component="jvm",pool="tenured-loa"} 34277.0
+jvm_memory_pool_free_bytes_count{component="jvm",pool="tenured-loa"} 34277.0
+jvm_memory_pool_free_bytes_sum{component="jvm",pool="tenured-loa"} 1297507287040.0
+jvm_memory_pool_free_bytes_bucket{le="512.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="1024.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="2048.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="4096.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="16384.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="65536.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="524288.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="1048576.0",component="jvm",pool="jit-code-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="+Inf",component="jvm",pool="jit-code-cache"} 34277.0
+jvm_memory_pool_free_bytes_count{component="jvm",pool="jit-code-cache"} 34277.0
+jvm_memory_pool_free_bytes_sum{component="jvm",pool="jit-code-cache"} 8701413949440.0
+jvm_memory_pool_free_bytes_bucket{le="512.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="1024.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="2048.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="4096.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="16384.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="65536.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="524288.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="1048576.0",component="jvm",pool="nursery-allocate"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="+Inf",component="jvm",pool="nursery-allocate"} 34277.0
+jvm_memory_pool_free_bytes_count{component="jvm",pool="nursery-allocate"} 34277.0
+jvm_memory_pool_free_bytes_sum{component="jvm",pool="nursery-allocate"} 7972461740032.0
+jvm_memory_pool_free_bytes_bucket{le="512.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="1024.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="2048.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="4096.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="16384.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="65536.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="524288.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="1048576.0",component="jvm",pool="tenured-soa"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="+Inf",component="jvm",pool="tenured-soa"} 34277.0
+jvm_memory_pool_free_bytes_count{component="jvm",pool="tenured-soa"} 34277.0
+jvm_memory_pool_free_bytes_sum{component="jvm",pool="tenured-soa"} 34019546759168.0
+jvm_memory_pool_free_bytes_bucket{le="512.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="1024.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="2048.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="4096.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="16384.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="65536.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="524288.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="1048576.0",component="jvm",pool="jit-data-cache"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="+Inf",component="jvm",pool="jit-data-cache"} 34277.0
+jvm_memory_pool_free_bytes_count{component="jvm",pool="jit-data-cache"} 34277.0
+jvm_memory_pool_free_bytes_sum{component="jvm",pool="jit-data-cache"} 13448400338944.0
+jvm_memory_pool_free_bytes_bucket{le="512.0",component="jvm",pool="class-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="1024.0",component="jvm",pool="class-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="2048.0",component="jvm",pool="class-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="4096.0",component="jvm",pool="class-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="16384.0",component="jvm",pool="class-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="65536.0",component="jvm",pool="class-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="524288.0",component="jvm",pool="class-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="1048576.0",component="jvm",pool="class-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="+Inf",component="jvm",pool="class-storage"} 34277.0
+jvm_memory_pool_free_bytes_count{component="jvm",pool="class-storage"} 34277.0
+jvm_memory_pool_free_bytes_sum{component="jvm",pool="class-storage"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="512.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="1024.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="2048.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="4096.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="16384.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="65536.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="524288.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="1048576.0",component="jvm",pool="nursery-survivor"} 0.0
+jvm_memory_pool_free_bytes_bucket{le="+Inf",component="jvm",pool="nursery-survivor"} 34277.0
+jvm_memory_pool_free_bytes_count{component="jvm",pool="nursery-survivor"} 34277.0
+jvm_memory_pool_free_bytes_sum{component="jvm",pool="nursery-survivor"} 874063462400.0
+jvm_memory_pool_free_bytes_bucket{le="512.0",component="jvm",pool="miscellaneous-non-heap-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="1024.0",component="jvm",pool="miscellaneous-non-heap-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="2048.0",component="jvm",pool="miscellaneous-non-heap-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="4096.0",component="jvm",pool="miscellaneous-non-heap-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="16384.0",component="jvm",pool="miscellaneous-non-heap-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="65536.0",component="jvm",pool="miscellaneous-non-heap-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="524288.0",component="jvm",pool="miscellaneous-non-heap-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="1048576.0",component="jvm",pool="miscellaneous-non-heap-storage"} 34277.0
+jvm_memory_pool_free_bytes_bucket{le="+Inf",component="jvm",pool="miscellaneous-non-heap-storage"} 34277.0
+jvm_memory_pool_free_bytes_count{component="jvm",pool="miscellaneous-non-heap-storage"} 34277.0
+jvm_memory_pool_free_bytes_sum{component="jvm",pool="miscellaneous-non-heap-storage"} 0.0
+# TYPE histogram_database_getDocument_finish_seconds histogram
+# HELP process_hiccups_seconds Tracks the process hiccups generated by either garbage collection or OS noise
+# TYPE process_hiccups_seconds histogram
+process_hiccups_seconds_bucket{le="0.005",component="process"} 138236767.0
+process_hiccups_seconds_bucket{le="0.01",component="process"} 154547874.0
+process_hiccups_seconds_bucket{le="0.025",component="process"} 197061782.0
+process_hiccups_seconds_bucket{le="0.05",component="process"} 260880914.0
+process_hiccups_seconds_bucket{le="0.075",component="process"} 304380237.0
+process_hiccups_seconds_bucket{le="0.1",component="process"} 309183410.0
+process_hiccups_seconds_bucket{le="0.25",component="process"} 311445035.0
+process_hiccups_seconds_bucket{le="0.5",component="process"} 311916702.0
+process_hiccups_seconds_bucket{le="0.75",component="process"} 312000801.0
+process_hiccups_seconds_bucket{le="1.0",component="process"} 312029089.0
+process_hiccups_seconds_bucket{le="2.5",component="process"} 312046414.0
+process_hiccups_seconds_bucket{le="5.0",component="process"} 312046414.0
+process_hiccups_seconds_bucket{le="7.5",component="process"} 312046414.0
+process_hiccups_seconds_bucket{le="10.0",component="process"} 312046414.0
+process_hiccups_seconds_bucket{le="+Inf",component="process"} 312046414.0
+process_hiccups_seconds_count{component="process"} 312046414.0
+process_hiccups_seconds_sum{component="process"} 6945001.208897956

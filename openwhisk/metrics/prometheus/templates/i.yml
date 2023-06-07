@@ -1,0 +1,17 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: prometheus2
+  labels: 
+    app.kubernetes.io/component: prometheus2
+spec:
+  entryPoints:
+  - https
+  routes:
+  - kind: Rule
+    match: Host(`prometheus-ow.liquidfaas.cloud`)
+    services:
+    - kind: Service
+      name: openwhisk-prometheus-server
+      namespace: openwhisk-second
+      port: http-web

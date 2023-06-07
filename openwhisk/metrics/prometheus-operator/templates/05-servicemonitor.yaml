@@ -1,0 +1,13 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: prometheus-operator
+  labels: {{ include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: prometheus-operator
+spec:
+  endpoints:
+  - port: metrics
+    honorLabels: true
+  selector:
+    matchLabels: {{ include "app.labels" . | nindent 6 }}
+      app.kubernetes.io/component: prometheus-operator
