@@ -1,0 +1,25 @@
+{{- if .Values.influx.enabled }}
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDataSource
+metadata:
+  name: influx
+  labels: {{ include "grafana.app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: influx
+    name: grafana
+    user-action-pod: "true"
+spec:
+  name: influx
+  datasources:
+  - access: "proxy"
+    isDefault: true
+    name: "influx"
+    type: "influxdb"
+    url: {{ .Values.influx.url }}
+    jsonData:
+      version: Flux
+      organization: {{ .Values.influx.organization }}
+      defaultBucket: {{ .Values.influx.bucket }}
+      tlsSkipVerify: true
+    secureJsonData:
+      token: {{ .Values.influx.token }}
+{{- end }}

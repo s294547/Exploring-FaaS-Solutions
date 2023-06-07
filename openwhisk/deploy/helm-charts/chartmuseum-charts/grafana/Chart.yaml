@@ -1,0 +1,7 @@
+apiVersion: v2
+icon: https://artifacthub.io/image/7e652531-b40d-4cd4-a533-d7be7375a241@3x
+keywords:
+- grafana
+- observability
+name: grafana
+version: 1.0.0

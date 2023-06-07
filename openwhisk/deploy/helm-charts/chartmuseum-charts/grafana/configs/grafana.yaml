@@ -1,0 +1,28 @@
+log:
+  mode: "console"
+  level: "{{ .Values.opt.log_level }}"
+log.frontend:
+  enabled: true
+auth:
+  disable_login_form: false
+  disable_signout_menu: false
+users:
+  viewers_can_edit: false
+auth.anonymous:
+  enabled: false
+security:
+  admin_user: {{ .Values.auth.admin.username }}
+  admin_password: {{ .Values.auth.admin.password }}
+{{- if .Values.auth.oidc.enabled }}
+auth.generic_oauth:
+  enabled: True
+  allow_sign_up: True
+  scopes: "openid profile email"
+  empty_scopes: false
+  role_attribute_path: contains(groups[*], '{{ .Values.auth.oidc.adminGroup | default "Administrators" }}') && 'Admin' || 'Viewer'
+  login_attribute_path: "preferred_username"
+
+  auth_url: "{{ .Values.auth.oidc.issuer_url }}/protocol/openid-connect/auth"
+  token_url: "{{ .Values.auth.oidc.issuer_url }}/protocol/openid-connect/token"
+  api_url: "{{ .Values.auth.oidc.issuer_url }}/protocol/openid-connect/userinfo"
+{{- end }}

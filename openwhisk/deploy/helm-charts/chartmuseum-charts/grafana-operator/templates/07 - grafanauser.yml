@@ -1,0 +1,10 @@
+{{- if .Values.grafanauser.enabled }}
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaUser
+metadata:
+  name: grafana
+spec:
+  name: {{ .Values.grafanauser.name }}
+  password: {{ .Values.grafanauser.password }}
+  role: Viewer
+{{- end }}

@@ -1,0 +1,32 @@
+global:
+  domain_name: 'liquidfaas.cloud'
+opt:
+  image: "grafana/grafana:9.4.7"
+  log_level: warn
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 384Mi
+plugins:
+  - grafana-piechart-panel
+  - petrslavotinek-carpetplot-panel
+  - grafana-clock-panel
+  - snuids-trafficlights-panel
+auth:
+  admin:
+    username: admin
+    password: admin
+  oidc:
+    enabled: false
+influx:
+  enabled: true
+  token: ZwWM2Gx17aMnJrBSIvbec1WK0Xga1oCJ
+  organization: influxdata
+  bucket: aggregates
+  url: http://influxdb-influxdb2:80
+dashboard:
+  enabled: true
+
