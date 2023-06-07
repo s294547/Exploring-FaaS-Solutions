@@ -1,0 +1,38 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: openwhisk-controller
+  namespace: openwhisk-second
+spec:
+  endpoints:
+  - path: /metrics
+    port: http
+  selector:
+    matchLabels:
+      name: openwhisk-controller
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: openwhisk-user-events
+  namespace: openwhisk-second
+spec:
+  endpoints:
+  - path: /metrics
+    port: http
+  selector:
+    matchLabels:
+      name: openwhisk-user-events
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: openwhisk-invoker
+  namespace: openwhisk-second
+spec:
+  podMetricsEndpoints:
+  - port: invoker
+    path: /metrics
+  selector:
+    matchLabels:
+      name: openwhisk-invoker

@@ -22,7 +22,7 @@ You will find the following charts:
 2. [grafana]: a grafana chart.
 3. [grafana-operator]: a grafana operator chart.
 4. [influxdb2]: a chart extended from the original InfluxDB chart.
-5. [mosquitto-0.1.0]: a mosquitto chart, enriched with a MQTT provider functionality.
+5. [mqtt-provicer]: a chart to deploy an OpenWhisk MQTT provider functionality.
 6. [openwhisk]: a chart extended from the original Apache OpenWhisk chart.
 7. [traefik]: a chart to deploy traefik.
 8. [edge-chart]: a chart to deploy the entire edge solution based on OpenWhisk related to my master thesis.

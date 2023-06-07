@@ -1,4 +1,4 @@
-# OPENWHISK - VIEWS.JSON
+# OPENWHISK - ACTIONS AND TRIGGERS
 
 <div style="margin-left: auto;
             margin-right: auto;
@@ -11,9 +11,17 @@
 </div>
 
 1. [Introduction](#introduction)
+2. [views.json](#views.json)
 
 
 ## Introduction
+
+
+In this folder, you will find:
+1. [actions-and-triggers]: the actions implemented on the OpenWhisk instance.
+2. [views.json]: a JSON document that defines views for a CouchDB database
+
+## Views.json
 
 This folder contains a JSON document that defines views for a CouchDB database. The views are defined under the views property, and there are four of them:
 

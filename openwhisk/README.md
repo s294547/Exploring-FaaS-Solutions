@@ -19,3 +19,4 @@ This folder contains all the work related to my thesis project on Openwhisk.
 You will find two sub-folders:
 1. [deploy]: This folder contains the final solution, together with the helm charts and the scripts to deploy both the edge instances and the central instance.
 2. [prototypes]: This folder contains all the material and resources used during the development of the thesis. 
+3. [metrics]: This folder contains all the material related to the metrics and the demonstration of feasibility of the solution. 

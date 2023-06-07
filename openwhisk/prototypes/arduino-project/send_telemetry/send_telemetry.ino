@@ -23,6 +23,7 @@ const char* password = "giugi99ciao"; //Inserire qui la password WiFi
 unsigned long time_last = 0;        // time ultima rilevazione
 unsigned long time_current;         // time corrente
 const long interval = 10000;           
+int i=0;
 // fisso l'intervallo tra una rilevazione e l'altra ad esempio a 15 minuti
 // 900000ms = 9000s=15 minuti 
 
@@ -32,7 +33,8 @@ const char *mqtt_broker = "38.242.158.232";
 const char *topic = "test";
 const char *mqtt_username = "test";
 const char *mqtt_password = "test";
-const int mqtt_port = 32194;
+const int mqtt_port = 30759;
+const int mqtt_port2 = 32443;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -104,6 +106,7 @@ void loop()
  
 void rileva_invia()
 {
+    i++;
    // faccio 3 letture in modo che i valori letti dal sensore DHT11 , che non è velocissimo,      
    // si stabilizzino 
    for(int i=0;i<3;i++)
@@ -124,7 +127,12 @@ void rileva_invia()
     String s="Umidità= "+String(h)+"     Temperatura="+String(t);
     Serial.println(s);
     String s2=String(h)+"#"+String(t)+"#";
-    client.setServer(mqtt_broker, mqtt_port);
+    if(i%2==0){
+      client.setServer(mqtt_broker, mqtt_port);
+    }
+    else{
+      client.setServer(mqtt_broker, mqtt_port2);
+    }
     client.setKeepAlive(6000);
 while (!client.connected()) {
     String client_id = "esp8266-client-";
@@ -144,7 +152,11 @@ while (!client.connected()) {
   doc["temperature"] = t;
   doc["gas_perc"] = g;
   doc["device_fingerprint"] = ucid;
+  if(i%2==0){
   doc["datacenter_id"] = dataCenterID;
+  }
+  else
+    doc["datacenter_id"] = 2;
   String json_data;
   serializeJson(doc, json_data);
 
@@ -153,5 +165,6 @@ while (!client.connected()) {
 
   // Print sensor data to serial monitor
   Serial.println(json_data);
+  client.disconnect();
     
 }

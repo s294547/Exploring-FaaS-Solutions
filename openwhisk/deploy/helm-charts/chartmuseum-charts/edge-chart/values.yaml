@@ -66,6 +66,17 @@ openwhisk:
         initialDelaySeconds: 100
         periodSeconds: 10
         timeoutSeconds: 1000
+  metrics:
+    # set true to enable prometheus exporter
+    prometheusEnabled: true
+    # passing prometheus-enabled by a config file, required by openwhisk
+    whiskconfigFile: "whiskconfig.conf"
+    # set true to enable Kamon
+    kamonEnabled: true
+    # set true to enable Kamon tags
+    kamonTags: true
+    # set true to enable user metrics
+    userMetricsEnabled: true
 mosquitto:
   # Default values for mosquitto.
 
@@ -156,6 +167,7 @@ mosquitto:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+mqtt-provider:
   provider:
     enabled: true
     providerPort: "3000"

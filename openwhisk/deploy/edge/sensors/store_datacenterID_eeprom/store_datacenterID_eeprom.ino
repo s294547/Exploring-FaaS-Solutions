@@ -8,8 +8,6 @@ uint32_t dataCenterID = 1; // replace this with a unique identifier for the data
 void setup() {
   Serial.begin(115200);
   Serial.println();
-  
-  // Check if UCID has already been written to EPROM
 
   EEPROM.begin(sizeof(dataCenterID));
 

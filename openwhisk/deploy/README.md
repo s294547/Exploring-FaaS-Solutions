@@ -132,7 +132,7 @@ Overall, leveraging OpenWhisk for edge device monitoring can be optimized for fo
 
 ![arch-aggregates](./images/archAggregates.jpg)
 
-Another functionality has been implemented: some aggregates are computed every helf an hour on the collected data for each local cluster and they are finally sent on a InfluxDB database on the centralized cluster. The operation of computing the aggregates is done with an action also in this case and the trigger related to it is fired with an Alarm Provider, which is natively provided when deployin OpenWhisk.
+Another functionality has been implemented: some aggregates are computed every helf an hour on the collected data for each local cluster and they are finally sent on a InfluxDB database on the centralized cluster. The operation of computing the aggregates is done with some actions also in this case and the trigger related to them is fired with an Alarm Provider, which is natively provided when deployin OpenWhisk.
 
 Finally, I've also given the possibility to have a visual representation of the aggregates computed for each data center, deploying Grafana on the centralized instance. In the Grafana instance there will be just a Grafana dashboard, with multiple panels to show the different types of aggregate data for each data center. It possible to select the specific data center thanks to a template variable. 
 

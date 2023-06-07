@@ -16,7 +16,8 @@
 4. [Grafana Operator](#grafana-operator)
 5. [InfluxDB](#influxdb)
 6. [OpenWhisk](#openwhisk)
-7. [Values](#values)
+7. [MQTT Provider](#mqtt-provider)
+8. [Values](#values)
 
 
 ## Introduction
@@ -28,6 +29,7 @@ This chart is provided to deploy the centralized solution based on OpenWhisk, wh
 2. A CouchDB database shared between the local and edge OpenWhisk instances to store all their data
 3. A centralized InfluxDB database, which should keep the aggregates 
 4. Grafana and Grafana Operator, in order to deploy a Grafana Dashboard to monitor the aggregate data sent by edge instances. 
+5. A MQTT provider, to handle the creation, modification and elimination of triggers that are fired when a message is published on a certain MQTT topic.
  
 ## CouchDB
  
@@ -77,6 +79,16 @@ helm pull chartmuseum/openwhisk
 
 This chart is an extension of the standard Apache OpenWhisk helm chart. This OpenWhisk instance should be set to use an external couchdb database and to initialize it. 
 
+## MQTT Provider
+The chart deploys an OpenWhisk MQTT provider, it can be retrieved using those commands: 
+
+```
+helm repo add chartmuseum https://chart.liquidfaas.cloud
+helm pull chartmuseum/mqtt-provider
+```
+
+This chart is a chart deploying a MQTT provider for OpenWhisk, based on the solution provided [here](https://blog.zhaw.ch/splab/2019/03/15/building-a-sample-mqtt-based-application-on-openwhisk/). 
+
 ## Values
 
 This section will explain the critical values that can be found in [values.yaml](./values.yaml) and the recommended values when deploying this chart for an environment kindred to my master thesis' environment.
@@ -116,5 +128,13 @@ The fields are:
 - `influxdb2.adminUser.organization`: This field specifies the organization used by InfluxDB.
 - `influxdb2.adminUser.bucket`: This field specifies the bucket used by InfluxDB.
 - `influxdb2.iroute.externalUrl`: This field specifies the external URL used by InfluxDB.
+
+- `.mqtt-provider.provider.providerPort`: sets the port number that the MQTT provider listens on.
+- `.mqtt-provider.provider.couchdbUsername`: sets the username for the CouchDB instance used by MQTT provider. **It should be consistent with the CouchDB username provided in the centralized instance.**
+- `.mqtt-provider.provider.couchdbPassword`: sets the password for the CouchDB instance used by MQTT provider. **It should be consistent with the CouchDB password provided in the centralized instance.**
+- `.mqtt-provider.provider.couchdbGateway` : sets the gateway address for the CouchDB instance used by Mosquitto. **In particular, in the edge instance, the host name of the CouchDB Traefik Ingress Route, since the database is deployed outside the cluster**.
+- `.mqtt-provider.provider.couchdbExtPort`: sets the external port number for the CouchDB instance used by Mosquitto. **In particular, in the edge instance, the port should be 443, since the database is deployed outside the cluster and we are going to contact it with HTTPS**.
+- `.mqtt-provider.openwhisk.apiHost`: sets the API host for OpenWhisk, which is used by MQTT provider. **It should be consistent with the local OpenWhisk API Host, which is set in the values file**.
+
 
 It is important to enable persistence for both InfluxDB and CouchDB.

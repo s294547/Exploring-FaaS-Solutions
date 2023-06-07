@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mqtt-provider-configmap
+  labels:
+    name: mqtt-provider
+    user-action-pod: "true"
+  namespace: {{ .Release.Namespace }}
+data:
+  couchdbUsername: "{{ .Values.provider.couchdbUsername }}"
+  couchdbPassword: "{{ .Values.provider.couchdbPassword }}"
+  couchdbGateway: "{{ .Values.provider.couchdbGateway }}"
+  couchdbExtPort: "{{ .Values.provider.couchdbExtPort }}"
+  apiHost: "{{ .Values.openwhisk.apiHost }}"

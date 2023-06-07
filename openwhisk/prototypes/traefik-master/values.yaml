@@ -35,4 +35,4 @@ traefik:
 
 # ========== ========== ========== ========== ==========
 metrics:
-  enabled: true
+  enabled: false

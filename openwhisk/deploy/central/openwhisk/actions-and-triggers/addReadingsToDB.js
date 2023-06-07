@@ -1,7 +1,5 @@
 function main(args) {
   var request = require('request');
-  console.log("body: ");
-  console.log(typeof args.body);
   const url= args.influx_url;
   const token= args.influx_token;
   const org= args.influx_org;

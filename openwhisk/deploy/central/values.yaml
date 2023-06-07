@@ -711,3 +711,12 @@ couchdb:
   iroute:
     enabled: true
     gateway: couchdb-gateway.liquidfaas.cloud
+mqtt-provider:
+  provider:
+    providerPort: "3000"
+    couchdbUsername: admin
+    couchdbPassword: admin
+    couchdbGateway: "couchdb-gateway.liquidfaas.cloud"
+    couchdbExtPort: "443"
+  openwhisk:
+    apiHost: "38.242.158.232"

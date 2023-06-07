@@ -1,0 +1,11 @@
+metrics:
+  # set true to enable prometheus exporter
+  prometheusEnabled: true
+  # passing prometheus-enabled by a config file, required by openwhisk
+  whiskconfigFile: "whiskconfig.conf"
+  # set true to enable Kamon
+  kamonEnabled: true
+  # set true to enable Kamon tags
+  kamonTags: true
+  # set true to enable user metrics
+  userMetricsEnabled: true

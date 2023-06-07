@@ -14,6 +14,8 @@ DHT dht(D1,tipoDHT);  //Istanzia l'oggetto dht della classe DHT
 float h;          //umidità   
 float t;         //temperatur
 float g; //gas
+int o=1;
+int l=0; 
 
 //***Configurazione WiFI: impostazione delle credenziali di rete 
 const char* ssid = "yami";        //Inserire qui l'SSID
@@ -32,10 +34,19 @@ const char *mqtt_broker = "38.242.158.232";
 const char *topic = "test";
 const char *mqtt_username = "test";
 const char *mqtt_password = "test";
-const int mqtt_port = 32694;
+const int mqtt_port = 31345;
+
+// MQTT Broker : TO BE CONFIGURED WITH YOUR BROKER VARIABLES
+const char *mqtt_broker2 = "38.242.158.232";
+const char *topic2 = "test";
+const char *mqtt_username2 = "test";
+const char *mqtt_password2 = "test";
+const int mqtt_port2 = 31607;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
+PubSubClient client2(espClient);
+
 
 // Device fingerprint and strin with the ID of the datacenter
 uint32_t ucid = ESP.getChipId();
@@ -97,7 +108,12 @@ void loop()
  
     // il led 2 si accende per 2 secondi  segnalando che è stata fatta una lettura
       digitalWrite(D4, 1);  
-      delay(2000);
+      delay(2*60*1000);
+      l+=2;
+      if(l==120){
+        l=0;
+        o=o*2;
+      }
       digitalWrite(D4, 0);
   }
 }
@@ -124,7 +140,7 @@ void rileva_invia()
     String s="Umidità= "+String(h)+"     Temperatura="+String(t);
     Serial.println(s);
     String s2=String(h)+"#"+String(t)+"#";
-    client.setServer(mqtt_broker, mqtt_port);
+      client.setServer(mqtt_broker, mqtt_port);
     client.setKeepAlive(6000);
 while (!client.connected()) {
     String client_id = "esp8266-client-";
@@ -136,7 +152,7 @@ while (!client.connected()) {
         Serial.print(client.state());
         delay(2000);
     }
-}
+}  
 
     // Convert sensor data to JSON format
   StaticJsonDocument<200> doc;
@@ -149,9 +165,37 @@ while (!client.connected()) {
   serializeJson(doc, json_data);
 
   // Publish sensor data to MQTT topic
+  for(int i=0; i<16 ; i++)
     client.publish(topic, json_data.c_str());
 
   // Print sensor data to serial monitor
   Serial.println(json_data);
+
+
+     /* client2.setServer(mqtt_broker, mqtt_port2);
+    client2.setKeepAlive(6000);
+while (!client2.connected()) {
+    String client_id2 = "esp8266-client-";
+    client_id2 += String(WiFi.macAddress());
+    Serial.printf("The client %s connects to the public mqtt broker\n", client_id2.c_str());
+    if (client2.connect(client_id2.c_str(), mqtt_username, mqtt_password)) {
+    } else {
+        Serial.print("failed with state ");
+        Serial.print(client2.state());
+        delay(2000);
+    }
+     StaticJsonDocument<200> doc2;
+  doc2["humidity"] = h;
+  doc2["temperature"] = t;
+  doc2["gas_perc"] = g;
+  doc2["device_fingerprint"] = ucid;
+  doc2["datacenter_id"] = 2;
+  String json_data2;
+  serializeJson(doc2, json_data2);
+    // Publish sensor data to MQTT topic
+    client2.publish(topic, json_data2.c_str());
+   // Print sensor data to serial monitor
+  Serial.println(json_data2);
+}*/
     
 }

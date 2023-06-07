@@ -20,31 +20,14 @@ function main(params) {
   
   
    try{
-    const query = `
+    const query = `  
     from(bucket: "measure")
     |> range(start: ${halfHourAgo.toISOString()}, stop: ${today.toISOString()})
-    |> filter(fn: (r) => r["_measurement"] == "gas_perc" or r["_measurement"] == "humidity" or r["_measurement"] == "temperature")
-    |> filter(fn: (r) => r["_field"] == "value")
-    |> group(columns: ["datacenter_id", "_measurement"])
-    |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
-    |> yield(name: "mean")
-  
-    from(bucket: "measure")
-    |> range(start: ${halfHourAgo.toISOString()}, stop: ${today.toISOString()})
-    |> filter(fn: (r) => r["_measurement"] == "gas_perc" or r["_measurement"] == "humidity" or r["_measurement"] == "temperature")
+    |> filter(fn: (r) => r["_measurement"] == "gas_perc" )
     |> filter(fn: (r) => r["_field"] == "value")
     |> group(columns: ["datacenter_id", "_measurement"])
     |> aggregateWindow(every: 1d, fn: max, createEmpty: false)
     |> yield(name: "max")
-  
-  
-    from(bucket: "measure")
-    |> range(start: ${halfHourAgo.toISOString()}, stop: ${today.toISOString()})
-    |> filter(fn: (r) => r["_measurement"] == "gas_perc" or r["_measurement"] == "humidity" or r["_measurement"] == "temperature")
-    |> filter(fn: (r) => r["_field"] == "value")
-    |> group(columns: ["datacenter_id", "_measurement"])
-    |> aggregateWindow(every: 1d, fn: min, createEmpty: false)
-    |> yield(name: "min")
     `;
   
   // Query InfluxDB instance
@@ -63,49 +46,22 @@ function main(params) {
     request(requestOptions, function (error, response, body) {
       if (!error && response.statusCode == 200) {
         const output= body;
+        console.log(body);
         const rows = output.split("\n"); // split the string into an array of rows
-        var humidity_avg;
-        var humidity_max;
-        var humidity_min;
-        var temperature_avg;
-        var temperature_max;
-        var temperature_min;
-        var gas_perc_avg;
         var gas_perc_max;
-        var gas_perc_min;
         var location;
         var j=0;
   
         rows.forEach(row => {
           const columns = row.split(","); // split the row into an array of columns
           columns.shift();
-          if(j==0 && columns[0]=="mean"){
-            location=columns[5];
+          if(j==0 && columns[0]=="max"){
+            location=columns[8];
             j++;
           }
           if(columns[0]=='max'){
             if(columns[7]=='gas_perc')
               gas_perc_max= columns[5];
-            if(columns[7]=='humidity')
-              humidity_max= columns[5];
-            if(columns[7]=='temperature')
-              temperature_max= columns[5];
-          }
-          if(columns[0]=='min'){
-            if(columns[7]=='gas_perc')
-              gas_perc_min= columns[5];
-            if(columns[7]=='humidity')
-              humidity_min= columns[5];
-            if(columns[7]=='temperature')
-              temperature_min= columns[5];
-          }
-          if(columns[0]=='mean'){
-            if(columns[4]=='gas_perc')
-              gas_perc_avg= columns[6];
-            if(columns[4]=='humidity')
-              humidity_avg= columns[6];
-            if(columns[4]=='temperature')
-              temperature_avg= columns[6];
           }
         });
         var tday = today.getTime() * 1000000;
@@ -113,10 +69,8 @@ function main(params) {
         var month= today.getMonth()+1;
         var day=today.getDate();
         // Construct the InfluxDB line protocol string
-        var influxData = `humidity,datacenter_id=${location},year=${year},month=${month},day=${day} avg=${humidity_avg},max=${humidity_max},min=${humidity_min} ${tday}\n`;
-        influxData +=`temperature,datacenter_id=${location},year=${year},month=${month},day=${day} avg=${temperature_avg},max=${temperature_max},min=${temperature_min} ${tday}\n`;
-        influxData +=`gas_perc,datacenter_id=${location},year=${year},month=${month},day=${day} avg=${gas_perc_avg},max=${gas_perc_max},min=${gas_perc_min} ${tday}\n`;
-  
+        var influxData =`gas_perc,datacenter_id=${location},year=${year},month=${month},day=${day} max=${gas_perc_max} ${tday}\n`;
+        console.log(influxData);
   
         const options = {
           url: central_url+'/api/v2/write?org='+central_org+'&bucket='+central_bucket+'&precision=ns',
@@ -130,8 +84,7 @@ function main(params) {
         };
     
         request(options, function(err, res, body) {
-          console.log(res)
-          console.log(err);
+          console.log(res.statusCode)
           if (err) {
             console.error(`Error sending daily aggregates to remote database: ${err}`);
           } else {

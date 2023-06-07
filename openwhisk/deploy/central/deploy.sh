@@ -25,11 +25,11 @@ fi
 apiHost=$(kubectl describe nodes | grep "InternalIP" | awk '{print $2}')
 
 # Replace the NodePort value in the YAML file
-sed -i "s/apiHostPort: [0-9]*/apiHostPort: $node_port/g" ./openwhisk/values.yaml
-sed -i "s/httpsNodePort: [0-9]*/httpsNodePort: $node_port/g" ./openwhisk/values.yaml 
+sed -i "s/apiHostPort: [0-9]*/apiHostPort: $node_port/g" ./values.yaml
+sed -i "s/httpsNodePort: [0-9]*/httpsNodePort: $node_port/g" ./values.yaml 
 
 # Replace the API host value in the YAML file
-sed -i "s/apiHostName: .*/apiHostName: $apiHost/g" ./openwhisk/values.yaml
+sed -i "s/apiHostName: .*/apiHostName: $apiHost/g" ./values.yaml
 
 # utiliy variables
 domainName=$(yq e '.domain_name' ./../parameters/parameters.yml)
@@ -69,7 +69,7 @@ grafanaExtPassword=$(yq e '.grafana.extPassword' ./../parameters/parameters.yml)
 chartmuseumLink="https://"+$(yq e '.chartmuseum.link' ./../parameters/parameters.yml) 
 chartmuseumLink+=".$domainName"
 
-# updating openwhisk values file
+# updating openwhisk values 
 
 yq e '.openwhisk.auth.guest= "'$owGuestAuth'"' ./values.yaml -i 
 yq e '.openwhisk.db.host= "'$couchdbSvc'"' ./values.yaml -i
@@ -77,7 +77,7 @@ yq e '.openwhisk.db.auth.username= "'$couchdbUsername'"' ./values.yaml -i
 yq e '.openwhisk.db.auth.password= "'$couchdbPassword'"' ./values.yaml -i
 yq e '.openwhisk.db.port= '$couchdbSvcPort'' ./values.yaml -i
 
-# updating couchdb values file
+# updating couchdb values 
 
 yq e '.couchdb.adminUsername= "'$couchdbUsername'"' ./values.yaml -i
 yq e '.couchdb.adminPassword= "'$couchdbPassword'"' ./values.yaml -i
@@ -85,7 +85,7 @@ yq e '.couchdb.service.externalPort= "'$couchdbSvcPort'"' ./values.yaml -i
 yq e '.couchdb.iroute.gateway= "'$couchdbGateway'"' ./values.yaml -i
 yq e '.couchdb.couchdbConfig.couchdb.uuid= "'$couchdbUuid'"' ./values.yaml -i
 
-# updating grafana values file
+# updating grafana values 
 
 yq e '.grafana.auth.admin.username= "'$grafanaUsername'"' ./values.yaml -i
 yq e '.grafana.auth.admin.password= "'$grafanaPassword'"' ./values.yaml -i
@@ -95,7 +95,7 @@ yq e '.grafana.influx.bucket= "'$influxCentralBucket'"' ./values.yaml -i
 yq e '.grafana.influx.url= "'$influxCentralUrlCompl'"' ./values.yaml -i
 yq e '.grafana.global.domain_name= "'$domainName'"' ./values.yaml -i
 
-# updating influxdb values file
+# updating influxdb values 
 
 
 yq e '.influxdb2.adminUser.user= "'$influxCentralUsername'"' ./values.yaml -i
@@ -105,6 +105,14 @@ yq e '.influxdb2.adminUser.organization= "'$influxCentralOrg'"' ./values.yaml -i
 yq e '.influxdb2.adminUser.bucket= "'$influxCentralBucket'"' ./values.yaml -i
 yq e '.influxdb2.iroute.externalUrl= "'$influxCentralUrl'"' ./values.yaml -i 
 
+# updating mqtt provider values
+
+yq e '.mqtt-provider.provider.providerPort= "'$providerPort'"' ./values.yaml -i
+yq e '.mqtt-provider.provider.couchdbUsername= "'$couchdbUsername'"' ./values.yaml -i
+yq e '.mqtt-provider.provider.couchdbPassword= "'$couchdbPassword'"' ./values.yaml -i
+yq e '.mqtt-provider.provider.couchdbGateway= "'$couchdbGateway'"' ./values.yaml -i
+yq e '.mqtt-provider.provider.couchdbExtPort= "'$couchdbExtPort'"' ./values.yaml -i
+yq e '.mqtt-provider.openwhisk.apiHost= "'$apiHost'"' ./values.yaml -i
 
 
 # the $1 variable contains the namespace
@@ -137,5 +145,61 @@ echo "Job $JOB_NAME has completed. Running post-job commands..."
 curl -X PUT "https://$couchdbUsername:$couchdbPassword@$couchdbGateway:$couchdbExtPort/topic_listeners"
 curl -X PUT "https://$couchdbUsername:$couchdbPassword@$couchdbGateway:$couchdbExtPort/topic_listeners/_design/subscriptions" --data-binary @./openwhisk/views.json
 
+# restart MQTT provider
+kubectl delete pod -n $1 -l name=mqtt-provider
+
 # Add external users to access to grafana
 curl -X POST -H 'Content-Type: application/json' -d '{"name":"'$grafanaExtUsername'", "login":"'$grafanaExtUsername'", "password":"'$grafanaExtPassword'" }' https://$grafanaUsername:$grafanaPassword@grafana.$1.$domainName/api/admin/users
+
+#Waiting for MQTT provider to be ready
+LABEL_SELECTOR="name=mqtt-provider"
+
+
+echo "Waiting for pod with label $LABEL_SELECTOR to be ready..."
+
+while [[ $(kubectl get pods -n $1 -l $LABEL_SELECTOR -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
+    sleep 1
+done
+
+echo "Pod with label $LABEL_SELECTOR is ready!"
+
+
+
+# Configure actions and triggers
+wsk package create --shared yes -p provider_endpoint "http://mqtt-provider:$providerPort/mqtt" mqtt -i
+wsk package update mqtt -a description 'The mqtt package provides functionality to connect to MQTT brokers' -i
+wsk action create -a feed true mqtt/mqtt_feed ./openwhisk/actions-and-triggers/feed_action.js -i
+wsk trigger create /guest/feed_trigger --feed /guest/mqtt/mqtt_feed -p topic 'test' -p url "http://$mosquittoUsername:$mosquittoPassword@$releaseName-mosquitto:$mosquittoPort" -p triggerName '/guest/feed_trigger' -i
+wsk trigger get /guest/feed_trigger -i &> /dev/null
+if [ $? -eq 0 ]; then
+  echo "Trigger already exists"
+else
+  echo "Trigger does not exist, creating it"
+  # try creating the trigger until successful
+  while ! wsk trigger create /guest/feed_trigger --feed /guest/mqtt/mqtt_feed -p topic 'test' -p url "http://$mosquittoUsername:$mosquittoPassword@$releaseName-mosquitto:$mosquittoPort" -p triggerName '/guest/feed_trigger' -i &> /dev/null; do
+    echo "Trigger creation failed, retrying in 5 seconds"
+    sleep 5
+  done
+fi
+wsk action create addReadingToDb ./openwhisk/actions-and-triggers/addReadingsToDB.js --param influx_url "$influxEdgeUrl" --param influx_token "$influxEdgeToken" --param influx_org "$influxEdgeOrg" --param influx_bucket "$influxEdgeBucket" -i
+wsk rule create mqttRule '/guest/feed_trigger' addReadingToDb -i
+
+wsk action create aggregatesGasAvgAction ./openwhisk/actions-and-triggers/aggregates/aggregatesGasAvgAction.js --param local_url "$influxEdgeUrl" --param local_token "$influxEdgeToken" --param local_org "$influxEdgeOrg" --param local_bucket "$influxEdgeBucket" --param central_url "https://$influxCentralUrl" --param central_token "$influxCentralToken" --param central_org "$influxCentralOrg" --param central_bucket "$influxCentralBucket" -i
+wsk action create aggregatesGasMinAction ./openwhisk/actions-and-triggers/aggregates/aggregatesGasMinAction.js --param local_url "$influxEdgeUrl" --param local_token "$influxEdgeToken" --param local_org "$influxEdgeOrg" --param local_bucket "$influxEdgeBucket" --param central_url "https://$influxCentralUrl" --param central_token "$influxCentralToken" --param central_org "$influxCentralOrg" --param central_bucket "$influxCentralBucket" -i
+wsk action create aggregatesGasMaxAction ./openwhisk/actions-and-triggers/aggregates/aggregatesGasMaxAction.js --param local_url "$influxEdgeUrl" --param local_token "$influxEdgeToken" --param local_org "$influxEdgeOrg" --param local_bucket "$influxEdgeBucket" --param central_url "https://$influxCentralUrl" --param central_token "$influxCentralToken" --param central_org "$influxCentralOrg" --param central_bucket "$influxCentralBucket" -i
+wsk action create aggregatesHumidityAvgAction ./openwhisk/actions-and-triggers/aggregates/aggregatesHumidityAvgAction.js --param local_url "$influxEdgeUrl" --param local_token "$influxEdgeToken" --param local_org "$influxEdgeOrg" --param local_bucket "$influxEdgeBucket" --param central_url "https://$influxCentralUrl" --param central_token "$influxCentralToken" --param central_org "$influxCentralOrg" --param central_bucket "$influxCentralBucket" -i
+wsk action create aggregatesHumidityMinAction ./openwhisk/actions-and-triggers/aggregates/aggregatesHumidityMinAction.js --param local_url "$influxEdgeUrl" --param local_token "$influxEdgeToken" --param local_org "$influxEdgeOrg" --param local_bucket "$influxEdgeBucket" --param central_url "https://$influxCentralUrl" --param central_token "$influxCentralToken" --param central_org "$influxCentralOrg" --param central_bucket "$influxCentralBucket" -i
+wsk action create aggregatesHumidityMaxAction ./openwhisk/actions-and-triggers/aggregates/aggregatesHumidityMaxAction.js --param local_url "$influxEdgeUrl" --param local_token "$influxEdgeToken" --param local_org "$influxEdgeOrg" --param local_bucket "$influxEdgeBucket" --param central_url "https://$influxCentralUrl" --param central_token "$influxCentralToken" --param central_org "$influxCentralOrg" --param central_bucket "$influxCentralBucket" -i
+wsk action create aggregatesTemperatureAvgAction ./openwhisk/actions-and-triggers/aggregates/aggregatesTemperatureAvgAction.js --param local_url "$influxEdgeUrl" --param local_token "$influxEdgeToken" --param local_org "$influxEdgeOrg" --param local_bucket "$influxEdgeBucket" --param central_url "https://$influxCentralUrl" --param central_token "$influxCentralToken" --param central_org "$influxCentralOrg" --param central_bucket "$influxCentralBucket" -i
+wsk action create aggregatesTemperatureMinAction ./openwhisk/actions-and-triggers/aggregates/aggregatesTemperatureMinAction.js --param local_url "$influxEdgeUrl" --param local_token "$influxEdgeToken" --param local_org "$influxEdgeOrg" --param local_bucket "$influxEdgeBucket" --param central_url "https://$influxCentralUrl" --param central_token "$influxCentralToken" --param central_org "$influxCentralOrg" --param central_bucket "$influxCentralBucket" -i
+wsk action create aggregatesTemperatureMaxAction ./openwhisk/actions-and-triggers/aggregates/aggregatesTemperatureMaxAction.js --param local_url "$influxEdgeUrl" --param local_token "$influxEdgeToken" --param local_org "$influxEdgeOrg" --param local_bucket "$influxEdgeBucket" --param central_url "https://$influxCentralUrl" --param central_token "$influxCentralToken" --param central_org "$influxCentralOrg" --param central_bucket "$influxCentralBucket" -i
+wsk trigger create aggregatesTrigger --feed /whisk.system/alarms/alarm -p cron "0 */30 * * * *"  -i
+wsk rule create aggregatesGasAvgRule aggregatesTrigger aggregatesGasAvgAction -i
+wsk rule create aggregatesGasMinRule aggregatesTrigger aggregatesGasMinAction -i
+wsk rule create aggregatesGasMaxRule aggregatesTrigger aggregatesGasMaxAction -i
+wsk rule create aggregatesTemperatureAvgRule aggregatesTrigger aggregatesTemperatureAvgAction -i
+wsk rule create aggregatesTemperatureMinRule aggregatesTrigger aggregatesTemperatureMinAction -i
+wsk rule create aggregatesTemperatureMaxRule aggregatesTrigger aggregatesTemperatureMaxAction -i
+wsk rule create aggregatesHumidityAvgRule aggregatesTrigger aggregatesHumidityAvgAction -i
+wsk rule create aggregatesHumidityMinRule aggregatesTrigger aggregatesHumidityMinAction -i
+wsk rule create aggregatesHumidityMaxRule aggregatesTrigger aggregatesHumidityMaxAction -i

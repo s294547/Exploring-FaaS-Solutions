@@ -26,11 +26,11 @@ fi
 apiHost="$(kubectl describe nodes | grep "InternalIP" | awk '{print $2}')"
 
 # Replace the NodePort value in the YAML file
-sed -i "s/apiHostPort: [0-9]*/apiHostPort: $node_port/g" ./openwhisk/values.yml 
-sed -i "s/httpsNodePort: [0-9]*/httpsNodePort: $node_port/g" ./openwhisk/values.yml 
+sed -i "s/apiHostPort: [0-9]*/apiHostPort: $node_port/g" ./values.yaml 
+sed -i "s/httpsNodePort: [0-9]*/httpsNodePort: $node_port/g" ./values.yaml 
 
 # Replace the API host value in the YAML file
-sed -i "s/apiHostName: .*/apiHostName: $apiHost/g" ./openwhisk/values.yml 
+sed -i "s/apiHostName: .*/apiHostName: $apiHost/g" ./values.yaml 
 
 
 # utiliy variables
@@ -50,6 +50,7 @@ providerPort=$(yq e '.mosquitto.providerPort' ./../parameters/parameters.yml)
 mosquittoPort=$(yq e '.mosquitto.mosquittoPort' ./../parameters/parameters.yml)
 mosquittoUsername=$(yq e '.mosquitto.username' ./../parameters/parameters.yml)
 mosquittoPassword=$(yq e '.mosquitto.plainPassword' ./../parameters/parameters.yml)
+mosquittoEncPassword=$(yq e '.mosquitto.password' ./../parameters/parameters.yml)
 influxCentralUrl=$(yq e '.influxdb.central.externalUrl' ./../parameters/parameters.yml)
 influxCentralUrl+=".$domainName"
 influxCentralUrlCompl="http://$releaseName-influxdb2:80"
@@ -66,7 +67,7 @@ influxEdgeUsername=$(yq e '.influxdb.edge.username' ./../parameters/parameters.y
 influxEdgePassword=$(yq e '.influxdb.edge.password' ./../parameters/parameters.yml)
 chartmuseumLink="https://"+$(yq e '.chartmuseum.link' ./../parameters/parameters.yml) 
 chartmuseumLink+=".$domainName"
-# updating openwhisk values file
+# updating openwhisk values 
 
 
 yq e '.openwhisk.auth.guest= "'$owGuestAuth'"' ./values.yaml -i 
@@ -75,7 +76,7 @@ yq e '.openwhisk.db.auth.username= "'$couchdbUsername'"' ./values.yaml -i
 yq e '.openwhisk.db.auth.password= "'$couchdbPassword'"' ./values.yaml -i
 yq e '.openwhisk.db.port= '$couchdbExtPort'' ./values.yaml -i
 
-# updating influxdb values file
+# updating influxdb values 
 
 yq e '.influxdb2.adminUser.user= "'$influxEdgeUsername'"' ./values.yaml -i
 yq e '.influxdb2.adminUser.password= "'$influxEdgePassword'"' ./values.yaml -i
@@ -84,17 +85,21 @@ yq e '.influxdb2.adminUser.organization= "'$influxEdgeOrg'"' ./values.yaml -i
 yq e '.influxdb2.adminUser.bucket= "'$influxEdgeBucket'"' ./values.yaml -i
 
 
-# updating mosquitto values file
+# updating mosquitto values 
 
 yq e '.mosquitto.auth.users[0].username= "'$mosquittoUsername'"' ./values.yaml -i
 yq e '.mosquitto.auth.users[0].password= "'$mosquittoEncPassword'"' ./values.yaml -i
 yq e '.mosquitto.service.mqttPort= "'$mosquittoPort'"' ./values.yaml -i
-yq e '.mosquitto.provider.providerPort= "'$providerPort'"' ./values.yaml -i
-yq e '.mosquitto.provider.couchdbUsername= "'$couchdbUsername'"' ./values.yaml -i
-yq e '.mosquitto.provider.couchdbPassword= "'$couchdbPassword'"' ./values.yaml -i
-yq e '.mosquitto.provider.couchdbGateway= "'$couchdbGateway'"' ./values.yaml -i
-yq e '.mosquitto.provider.couchdbExtPort= "'$couchdbExtPort'"' ./values.yaml -i
-yq e '.mosquitto.openwhisk.apiHost= "'$apiHost'"' ./values.yaml -i
+
+# updating mqtt provider values
+
+yq e '.mqtt-provider.provider.providerPort= "'$providerPort'"' ./values.yaml -i
+yq e '.mqtt-provider.provider.couchdbUsername= "'$couchdbUsername'"' ./values.yaml -i
+yq e '.mqtt-provider.provider.couchdbPassword= "'$couchdbPassword'"' ./values.yaml -i
+yq e '.mqtt-provider.provider.couchdbGateway= "'$couchdbGateway'"' ./values.yaml -i
+yq e '.mqtt-provider.provider.couchdbExtPort= "'$couchdbExtPort'"' ./values.yaml -i
+yq e '.mqtt-provider.openwhisk.apiHost= "'$apiHost'"' ./values.yaml -i
+
 
 # the $1 variable contains the namespace
 kubectl create namespace $1
@@ -103,10 +108,6 @@ helm repo update chartmuseum
 
 helm upgrade --install $releaseName chartmuseum/edge-chart -n $1 -f ./values.yaml
 
-# Configure wsk cli
-wsk -i property set --apihost $apiHost:$node_port
-# Read the guest value from the YAML file
-wsk -i property set --auth $owGuestAuth
 
 JOB_NAME=$releaseName-install-packages
 
@@ -121,29 +122,19 @@ while true; do
 done
 
 # Run some commands after the Job has completed
-echo "Job $JOB_NAME has completed. Running post-job commands..."
+echo "Job $JOB_NAME has completed. Installation completed"
 
+# Set the name of the service
+service_name="$releaseName-mosquitto"
 
-# Run the "wsk package list" command and save the output to a variable
-output=$(wsk package list -i)
+# Get the NodePort of the service
+mqtt_port=$(kubectl get svc ${service_name} -n $1 -o=jsonpath='{.spec.ports[0].nodePort}')
 
-# Check if the output contains the package you're looking for
-if [[ $output == *"mqtt"* ]]; then
-    echo "Found the mqtt package. Stopping script."
-    exit
-fi
-
-# If the script hasn't been stopped yet, continue with whatever actions you want to perform below this line
-echo "Did not find the mqtt package. Continuing with script."
-
-# Configure actions and triggers
-wsk package create --shared yes -p provider_endpoint "http://mqtt-provider:$providerPort/mqtt" mqtt -i
-wsk package update mqtt -a description 'The mqtt package provides functionality to connect to MQTT brokers' -i
-wsk action create -a feed true mqtt/mqtt_feed ./openwhisk/actions-and-triggers/feed_action.js -i
-wsk trigger create /guest/feed_trigger --feed /guest/mqtt/mqtt_feed -p topic 'test' -p url "http://$mosquittoUsername:$mosquittoPassword@$1-mosquitto:$mosquittoPort" -p triggerName '/guest/feed_trigger' -i
-wsk action create addReadingToDb ./openwhisk/actions-and-triggers/addReadingsToDB.js --param influx_url "$influxEdgeUrl" --param influx_token "$influxEdgeToken" --param influx_org "$influxEdgeOrg" --param influx_bucket "$influxEdgeBucket" -i
-wsk rule create mqttRule '/guest/feed_trigger' addReadingToDb -i
-
-wsk action update aggregatesAction ./openwhisk/actions-and-triggers/aggregatesAction.js --param local_url "$influxEdgeUrl" --param local_token "$influxEdgeToken" --param local_org "$influxEdgeOrg" --param local_bucket "$influxEdgeBucket" --param central_url "https://$influxCentralUrl" --param central_token "$influxCentralToken" --param central_org "$influxCentralOrg" --param central_bucket "$influxCentralBucket" -i
-wsk trigger create aggregatesTrigger --feed /whisk.system/alarms/alarm -p cron "0 */30 * * * *" -i
-wsk rule create aggregatesRule aggregatesTrigger aggregatesAction -i
+#setting the config file of the sensors code
+sed -i "s/#define ssid.*/#define ssid \"$ssid\;"/" ./sensors/send_telemetry/config.h
+sed -i "s/#define password.*/#define password \"$password\";/" ./sensors/send_telemetry/config.h
+sed -i "s/#define mqtt_broker.*/#define mqtt_broker \"$apiHost\";/" ./sensors/send_telemetry/config.h
+sed -i "s/#define topic.*/#define topic \"test\";/" ./sensors/send_telemetry/config.h
+sed -i "s/#define mqtt_username.*/#define mqtt_username \"$mosquittoUsername\";/" ./sensors/send_telemetry/config.h
+sed -i "s/#define mqtt_password.*/#define mqtt_password \"$mosquittoPassword\";/" ./sensors/send_telemetry/config.h
+sed -i "s/#define mqtt_port.*/#define mqtt_port $mqtt_port;/" ./sensors/send_telemetry/config.h

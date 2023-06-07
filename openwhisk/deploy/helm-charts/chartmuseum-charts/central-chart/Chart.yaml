@@ -32,3 +32,6 @@ dependencies:
 - name: couchdb
   version: "4.3.0"
   repository: "https://chart.liquidfaas.cloud/api"
+- name: mqtt-provider
+  version: "0.1.0"
+  repository: "https://chart.liquidfaas.cloud/api"

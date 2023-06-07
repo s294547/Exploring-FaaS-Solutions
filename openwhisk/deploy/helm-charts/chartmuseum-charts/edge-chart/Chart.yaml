@@ -20,6 +20,9 @@ dependencies:
 - name: mosquitto
   version: "0.1.0"
   repository: "https://chart.liquidfaas.cloud/api"
+- name: mqtt-provider
+  version: "0.1.0"
+  repository: "https://chart.liquidfaas.cloud/api"
 - name: openwhisk
   version: "1.0.1"
   repository: "https://chart.liquidfaas.cloud/api"
